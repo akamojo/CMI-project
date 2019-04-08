@@ -1,0 +1,7 @@
+.vs/
+bin/
+obj/
+addons.make
+*.sln
+*.vcxproj*
+icon.rc
