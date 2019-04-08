@@ -5,3 +5,8 @@ addons.make
 *.sln
 *.vcxproj*
 icon.rc
+Makefile
+config.make
+*.qbs
+*.qbs.user
+
