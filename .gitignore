@@ -10,3 +10,4 @@ config.make
 *.qbs
 *.qbs.user
 
+CMIproject.qbs.user CMIproject.user dirListExample.qbs.user
