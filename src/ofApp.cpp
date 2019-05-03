@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-	dir.listDir("videos/");
+	/*dir.listDir("videos/");
 	dir.allowExt("mov");
 	dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
 
@@ -21,7 +21,7 @@ void ofApp::setup(){
 		videos[i].setPaused(true);
 	}
 	currentVideo = 0;
-	videos[currentVideo].setPaused(false);
+	videos[currentVideo].setPaused(false);*/
 
 	camWidth = 320;  // try to grab at this size.
 	camHeight = 240;
@@ -46,16 +46,16 @@ void ofApp::setup(){
 
 	finder.setup("haarcascade_frontalface_default.xml");
 
-	ofBackground(255, 0, 144);
+	ofBackground(0);
 
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
 
-	for (int i = 0; i < (int)videos.size(); i++) {
+	/*for (int i = 0; i < (int)videos.size(); i++) {
 		videos[i].update();
-	}
+	}*/
 
 	vidGrabber.update();
 
@@ -69,34 +69,36 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-	if (dir.size() > 0) {
+	/*if (dir.size() > 0) {
 		ofSetColor(ofColor::white);
 
 		for (int i = 0; i < (int)videos.size(); i++) {
 			videos[i].draw(20, 20 + i * (videos[0].getHeight() + 10));
 		}
-	}
+	}*/
 
-	vidGrabber.draw(videos[0].getWidth() + 40, 20);
+	//vidGrabber.draw(videos[0].getWidth() + 40, 20);
+	vidGrabber.draw(0, 0);
+
 	ofSetHexColor(0xffffff);
 	ofNoFill();
 
 	for (unsigned int i = 0; i < finder.blobs.size(); i++)
 	{
 		ofRectangle cur = finder.blobs[i].boundingRect;
-		ofRect(videos[0].getWidth() + 40 + cur.x, cur.y, cur.width, cur.height);
+		ofRect(cur.x, cur.y, cur.width, cur.height);
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-	if (dir.size() > 0) {
+	/*if (dir.size() > 0) {
 		videos[currentVideo].setPaused(true);
 		currentVideo++;
 		currentVideo %= dir.size();
 
 		videos[currentVideo].setPaused(false);
-	}
+	}*/
 }
 
 //--------------------------------------------------------------

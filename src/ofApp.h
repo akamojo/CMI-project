@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "GuiApp.h"
 #include "ofxCvHaarFinder.h"
 
 class ofApp : public ofBaseApp{
@@ -29,8 +30,9 @@ class ofApp : public ofBaseApp{
 		int camWidth;
 		int camHeight;
 
-		ofDirectory dir;
-		vector<ofVideoPlayer> videos;
+		//ofDirectory dir;
+		//vector<ofVideoPlayer> videos;
 
-		int currentVideo;
+		//int currentVideo;
+		shared_ptr<GuiApp> gui;
 };
