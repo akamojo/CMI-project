@@ -14,11 +14,16 @@ public:
 
 	ofxButton upButton;
 	ofxButton downButton;
+	ofxButton addButton;
 
 	ofxPanel nav;
 	ofxPanel details;
 
 	ofxLabel videoName;
+
+	ofxButton playButton;
+	ofxButton pauseButton;
+	ofxButton stopButton;
 
 	ofDirectory dir;
 	vector<Thumbnail> thumbnails;
@@ -28,6 +33,11 @@ public:
 
 	void upButtonPressed();
 	void downButtonPressed();
+
+	void playButtonPressed();
+	void pauseButtonPressed();
+	void stopButtonPressed();
+	void addButtonPressed();
 
 	void playVideo(string name);
 	void thumbnailPressed();

@@ -12,10 +12,12 @@ void GuiApp::setup(){
 
 	upButton.addListener(this, &GuiApp::upButtonPressed);
 	downButton.addListener(this, &GuiApp::downButtonPressed);
+	addButton.addListener(this, &GuiApp::addButtonPressed);
 
 	nav.setup();
 	nav.add(upButton.setup("up"));
 	nav.add(downButton.setup("down"));
+	nav.add(addButton.setup("add new"));
 
 	ofBackground(255, 0, 144);
 
@@ -39,8 +41,15 @@ void GuiApp::setup(){
 			thumbnails[i].thumbnailSize, thumbnails[i].thumbnailSize);
 	}
 
+	playButton.addListener(this, &GuiApp::playButtonPressed);
+	pauseButton.addListener(this, &GuiApp::pauseButtonPressed);
+	stopButton.addListener(this, &GuiApp::stopButtonPressed);
+
 	details.setup();
 	details.add(videoName.setup("file", ""));
+	details.add(playButton.setup("play"));
+	details.add(pauseButton.setup("pause"));
+	details.add(stopButton.setup("stop"));
 
 	playVideo(thumbnails[3].name);
 
@@ -102,6 +111,27 @@ void GuiApp::upButtonPressed() {
 	}
 }
 
+void GuiApp::addButtonPressed() {
+	ofFileDialogResult result = ofSystemLoadDialog("Load file");
+	if (result.bSuccess) {
+		string path = result.getPath();
+		// load your file at `path`
+	}
+}
+
+void GuiApp::playButtonPressed() {
+	mainPlayer.play();
+	mainPlayer.setPaused(false);
+}
+
+void GuiApp::pauseButtonPressed() {
+	mainPlayer.setPaused(true);
+}
+
+void GuiApp::stopButtonPressed() {
+	mainPlayer.stop();
+}
+
 void GuiApp::thumbnailPressed() {
 	cout << "lol" << endl;
 }
@@ -109,4 +139,8 @@ void GuiApp::thumbnailPressed() {
 void GuiApp::exit() {
 	upButton.removeListener(this, &GuiApp::upButtonPressed);
 	downButton.removeListener(this, &GuiApp::downButtonPressed);
+	playButton.removeListener(this, &GuiApp::playButtonPressed);
+	pauseButton.removeListener(this, &GuiApp::pauseButtonPressed);
+	stopButton.removeListener(this, &GuiApp::stopButtonPressed);
+	addButton.removeListener(this, &GuiApp::addButtonPressed);
 }
