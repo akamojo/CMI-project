@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "GuiApp.h"
 #include "ofxMSAInteractiveObject.h"
 
 #define		IDLE_COLOR		0xFFFFFF
@@ -13,8 +14,13 @@ public:
 	ofVideoPlayer video;
 	bool enabled = false;
 	int thumbnailSize = 300;
+	string name;
+	//GuiApp app;
 
-	void setup(string path) {
+	void setup(string path) {//, GuiApp &appIn) {
+		//app = appIn;
+		name = path;
+
 		video.load(path);
 		video.setLoopState(OF_LOOP_NORMAL);
 		video.play();
@@ -61,6 +67,8 @@ public:
 	}
 
 	virtual void onPress(int x, int y, int button) {
+		//if (enabled)
+		//	app.thumbnailPressed();
 	}
 
 	virtual void onRelease(int x, int y, int button) {

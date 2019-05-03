@@ -33,11 +33,13 @@ void GuiApp::setup(){
 	// you can now iterate through the files and load them into the ofImage vector
 	for (int i = 0; i < (int)dir.size(); i++) {
 		cout << dir.getPath(i) << endl;
-		thumbnails[i].setup(dir.getPath(i));
+		thumbnails[i].setup(dir.getPath(i));//, *this);
 
 		thumbnails[i].set(300, 20 + (i%3) * (thumbnails[0].thumbnailSize + 10), 
 			thumbnails[i].thumbnailSize, thumbnails[i].thumbnailSize);
 	}
+
+	playVideo(thumbnails[(int)thumbnails.size() - 1].name);
 
 	ofSetVerticalSync(false);
 }
@@ -47,6 +49,7 @@ void GuiApp::update(){
 		thumbnails[i].video.update();
 		thumbnails[i].update();
 	}
+	mainPlayer.update();
 }
 
 void GuiApp::draw(){
@@ -62,7 +65,15 @@ void GuiApp::draw(){
 					20 + (i - initialVideo) * (thumbnails[0].thumbnailSize + 10));
 			}
 		}
+
+		mainPlayer.draw(thumbnailsOffset + thumbnails[0].thumbnailSize + 100, 20);
 	}
+}
+
+void GuiApp::playVideo(string name) {
+	mainPlayer.load(name);
+	mainPlayer.setLoopState(OF_LOOP_NORMAL);
+	mainPlayer.play();
 }
 
 void GuiApp::downButtonPressed() {
@@ -81,6 +92,10 @@ void GuiApp::upButtonPressed() {
 		}
 		initialVideo -= 3;
 	}
+}
+
+void GuiApp::thumbnailPressed() {
+	cout << "lol" << endl;
 }
 
 void GuiApp::exit() {

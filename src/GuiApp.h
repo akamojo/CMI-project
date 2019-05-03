@@ -10,6 +10,8 @@ public:
 	void update();
 	void draw();
 
+	ofVideoPlayer mainPlayer;
+
 	ofxButton upButton;
 	ofxButton downButton;
 
@@ -23,6 +25,10 @@ public:
 
 	void upButtonPressed();
 	void downButtonPressed();
+
+	void playVideo(string name);
+	void thumbnailPressed();
+
 	void exit();
 };
 
