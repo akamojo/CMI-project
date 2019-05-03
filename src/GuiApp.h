@@ -15,7 +15,10 @@ public:
 	ofxButton upButton;
 	ofxButton downButton;
 
-	ofxPanel gui;
+	ofxPanel nav;
+	ofxPanel details;
+
+	ofxLabel videoName;
 
 	ofDirectory dir;
 	vector<Thumbnail> thumbnails;

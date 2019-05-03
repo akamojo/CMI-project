@@ -13,10 +13,10 @@ void GuiApp::setup(){
 	upButton.addListener(this, &GuiApp::upButtonPressed);
 	downButton.addListener(this, &GuiApp::downButtonPressed);
 
-	gui.setup();
-	gui.add(upButton.setup("up"));
-	gui.add(downButton.setup("down"));
-	
+	nav.setup();
+	nav.add(upButton.setup("up"));
+	nav.add(downButton.setup("down"));
+
 	ofBackground(255, 0, 144);
 
 	dir.listDir("videos/");
@@ -39,7 +39,10 @@ void GuiApp::setup(){
 			thumbnails[i].thumbnailSize, thumbnails[i].thumbnailSize);
 	}
 
-	playVideo(thumbnails[(int)thumbnails.size() - 1].name);
+	details.setup();
+	details.add(videoName.setup("file", ""));
+
+	playVideo(thumbnails[3].name);
 
 	ofSetVerticalSync(false);
 }
@@ -53,7 +56,8 @@ void GuiApp::update(){
 }
 
 void GuiApp::draw(){
-	gui.draw();
+	nav.draw();
+	details.draw();
 
 	if (dir.size() > 0) {
 		ofSetColor(ofColor::white);
@@ -74,6 +78,10 @@ void GuiApp::playVideo(string name) {
 	mainPlayer.load(name);
 	mainPlayer.setLoopState(OF_LOOP_NORMAL);
 	mainPlayer.play();
+
+	videoName = thumbnails[3].name;
+	details.setPosition(thumbnailsOffset + thumbnails[0].thumbnailSize + 100,
+		20 + mainPlayer.getHeight() + 10);
 }
 
 void GuiApp::downButtonPressed() {
