@@ -7,10 +7,10 @@
 
 #include "GuiApp.h"
 
-inline bool ends_with(std::string const & value, std::string const & ending)
+inline bool ends_with(string const & value, string const & ending)
 {
 	if (ending.size() > value.size()) return false;
-	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+	return equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
 void GuiApp::setup(){
@@ -41,7 +41,8 @@ void GuiApp::setup(){
 		Thumbnail *t = new Thumbnail();
 
 		thumbnails.push_back(t);
-		thumbnails[i]->setup(dir.getPath(i));//, *this);
+
+		thumbnails[i]->setup(dir.getPath(i));
 
 		thumbnails[i]->set(300, 20 + (i%3) * (thumbnails[0]->thumbnailSize + 10), 
 			thumbnails[i]->thumbnailSize, thumbnails[i]->thumbnailSize);
@@ -57,7 +58,8 @@ void GuiApp::setup(){
 	details.add(pauseButton.setup("pause"));
 	details.add(stopButton.setup("stop"));
 
-	playVideo(thumbnails[3]->name);
+	cout << "Press space to see details of subsequent video" << endl;
+	playVideo();
 
 	ofSetVerticalSync(false);
 }
@@ -89,31 +91,40 @@ void GuiApp::draw(){
 	}
 }
 
-void GuiApp::playVideo(string name) {
-	mainPlayer.load(name);
-	mainPlayer.setLoopState(OF_LOOP_NORMAL);
-	mainPlayer.play();
+void GuiApp::playVideo() {
+	if (currentVideo % 3 + initialVideo < thumbnails.size()) {
+		mainPlayer.load(thumbnails[currentVideo % 3 + initialVideo]->name);
+		mainPlayer.setLoopState(OF_LOOP_NORMAL);
+		mainPlayer.play();
 
-	videoName = thumbnails[3]->name;
-	details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 100,
-		20 + mainPlayer.getHeight() + 10);
+		videoName = thumbnails[currentVideo % 3 + initialVideo]->name;
+		details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 100,
+			20 + mainPlayer.getHeight() + 10);
+	}
 }
 
 void GuiApp::downButtonPressed() {
 	if (initialVideo + 3 < (int)thumbnails.size()) {
+		currentVideo = 0;
 		initialVideo += 3;
-		for (int i = 0; i < initialVideo; i++) {
+
+		for (int i = 0; i < initialVideo; i++)
 			thumbnails[i]->enabled = false;
-		}
+		
+		playVideo();
 	}
 }
 
 void GuiApp::upButtonPressed() {
+
 	if (initialVideo - 3 >= 0) {
-		for (int i = initialVideo; i < (int)thumbnails.size(); i++) {
+		currentVideo = 0;
+
+		for (int i = initialVideo; i < (int)thumbnails.size(); i++) 
 			thumbnails[i]->enabled = false;
-		}
+		
 		initialVideo -= 3;
+		playVideo();
 	}
 }
 
@@ -124,6 +135,7 @@ void GuiApp::addButtonPressed() {
 		if (ends_with(path, "mov") || ends_with(path, "mp4")) {
 			Thumbnail *t = new Thumbnail();
 			thumbnails.push_back(t);
+
 			thumbnails[(int)thumbnails.size() - 1]->setup(path);
 
 			thumbnails[(int)thumbnails.size() - 1]->set(300, 20 + (((int)thumbnails.size() - 1) % 3)
@@ -146,8 +158,9 @@ void GuiApp::stopButtonPressed() {
 	mainPlayer.stop();
 }
 
-void GuiApp::thumbnailPressed() {
-	cout << "lol" << endl;
+void GuiApp::keyPressed(int key) {
+	currentVideo++;
+	playVideo();
 }
 
 void GuiApp::exit() {

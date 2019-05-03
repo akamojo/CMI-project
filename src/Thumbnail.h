@@ -15,10 +15,8 @@ public:
 	bool enabled = false;
 	int thumbnailSize = 300;
 	string name;
-	//GuiApp app;
 
-	void setup(string path) {//, GuiApp &appIn) {
-		//app = appIn;
+	void setup(string path) {
 		name = path;
 
 		video.load(path);

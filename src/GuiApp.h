@@ -30,6 +30,7 @@ public:
 
 	int initialVideo = 0;
 	int thumbnailsOffset = 250;
+	int currentVideo = 0;
 
 	void upButtonPressed();
 	void downButtonPressed();
@@ -39,8 +40,8 @@ public:
 	void stopButtonPressed();
 	void addButtonPressed();
 
-	void playVideo(string name);
-	void thumbnailPressed();
+	void playVideo();
+	void keyPressed(int);
 
 	void exit();
 };
