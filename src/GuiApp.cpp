@@ -26,13 +26,8 @@ void GuiApp::setup(){
 	// you can now iterate through the files and load them into the ofImage vector
 	for (int i = 0; i < (int)dir.size(); i++) {
 		cout << dir.getPath(i) << endl;
-		thumbnails[i].video.load(dir.getPath(i));
-		thumbnails[i].video.setLoopState(OF_LOOP_NORMAL);
-		thumbnails[i].video.play();
-		thumbnails[i].video.setPaused(true);
-
+		thumbnails[i].setup(dir.getPath(i));
 		thumbnails[i].set(300, 20 + i * (thumbnails[0].video.getHeight() + 10), 320, 240);
-		thumbnails[i].setup();
 	}
 
 	ofSetVerticalSync(false);
@@ -52,7 +47,7 @@ void GuiApp::draw(){
 		ofSetColor(ofColor::white);
 
 		for (int i = 0; i < (int)thumbnails.size(); i++) {
-			thumbnails[i].video.draw(300, 20 + i * (thumbnails[0].video.getHeight() + 10));
+			thumbnails[i].draw(300, 20 + i * (thumbnails[0].video.getHeight() + 10));
 		}
 	}
 }

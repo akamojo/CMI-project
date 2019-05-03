@@ -12,7 +12,12 @@ class Thumbnail : public ofxMSAInteractiveObject {
 public:
 	ofVideoPlayer video;
 
-	void setup() {
+	void setup(string path) {
+		video.load(path);
+		video.setLoopState(OF_LOOP_NORMAL);
+		video.play();
+		video.setPaused(true);
+
 		enableMouseEvents();
 		enableKeyEvents();
 	}
@@ -26,12 +31,13 @@ public:
 	}
 
 
-	void draw() {
+	void draw(int x, int y) {
 		/*if (isMousePressed()) ofSetHexColor(DOWN_COLOR);
 		else if (isMouseOver()) ofSetHexColor(OVER_COLOR);
 		else ofSetHexColor(IDLE_COLOR);
 
 		ofRect(x, y, width, height);*/
+		video.draw(x, y);
 	}
 
 	virtual void onRollOver(int x, int y) {
