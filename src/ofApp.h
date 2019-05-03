@@ -30,9 +30,5 @@ class ofApp : public ofBaseApp{
 		int camWidth;
 		int camHeight;
 
-		//ofDirectory dir;
-		//vector<ofVideoPlayer> videos;
-
-		//int currentVideo;
 		shared_ptr<GuiApp> gui;
 };

@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxGui.h"
+#include "Thumbnail.h"
 
 class GuiApp: public ofBaseApp {
 public:
@@ -9,15 +10,13 @@ public:
 	void update();
 	void draw();
 
-	void keyPressed(int key);
-
 	ofParameterGroup parameters;
 	ofParameter<float> radius;
 	ofParameter<ofColor> color;
 	ofxPanel gui;
 
 	ofDirectory dir;
-	vector<ofVideoPlayer> videos;
+	vector<Thumbnail> thumbnails;
 
 	int currentVideo;
 };

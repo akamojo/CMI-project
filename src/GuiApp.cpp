@@ -20,47 +20,39 @@ void GuiApp::setup(){
 
 				//allocate the vector to have as many ofImages as files
 	if (dir.size()) {
-		videos.assign(dir.size(), ofVideoPlayer());
+		thumbnails.assign(dir.size(), Thumbnail());
 	}
 
 	// you can now iterate through the files and load them into the ofImage vector
 	for (int i = 0; i < (int)dir.size(); i++) {
 		cout << dir.getPath(i) << endl;
-		videos[i].load(dir.getPath(i));
-		videos[i].setLoopState(OF_LOOP_NORMAL);
-		videos[i].play();
-		videos[i].setPaused(true);
+		thumbnails[i].video.load(dir.getPath(i));
+		thumbnails[i].video.setLoopState(OF_LOOP_NORMAL);
+		thumbnails[i].video.play();
+		thumbnails[i].video.setPaused(true);
+
+		thumbnails[i].set(300, 20 + i * (thumbnails[0].video.getHeight() + 10), 320, 240);
+		thumbnails[i].setup();
 	}
-	currentVideo = 0;
-	videos[currentVideo].setPaused(false);
 
 	ofSetVerticalSync(false);
 }
 
 void GuiApp::update(){
-	for (int i = 0; i < (int)videos.size(); i++) {
-		videos[i].update();
+	for (int i = 0; i < (int)thumbnails.size(); i++) {
+		thumbnails[i].video.update();
+		thumbnails[i].update();
 	}
 }
 
 void GuiApp::draw(){
 	gui.draw();
+
 	if (dir.size() > 0) {
 		ofSetColor(ofColor::white);
 
-		for (int i = 0; i < (int)videos.size(); i++) {
-			videos[i].draw(300, 20 + i * (videos[0].getHeight() + 10));
+		for (int i = 0; i < (int)thumbnails.size(); i++) {
+			thumbnails[i].video.draw(300, 20 + i * (thumbnails[0].video.getHeight() + 10));
 		}
-	}
-}
-
-void GuiApp::keyPressed(int key)
-{
-	if (dir.size() > 0) {
-		videos[currentVideo].setPaused(true);
-		currentVideo++;
-		currentVideo %= dir.size();
-
-		videos[currentVideo].setPaused(false);
 	}
 }
