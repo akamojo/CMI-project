@@ -10,14 +10,19 @@ public:
 	void update();
 	void draw();
 
-	ofParameterGroup parameters;
-	ofParameter<float> radius;
-	ofParameter<ofColor> color;
+	ofxButton upButton;
+	ofxButton downButton;
+
 	ofxPanel gui;
 
 	ofDirectory dir;
 	vector<Thumbnail> thumbnails;
 
-	int currentVideo;
+	int initialVideo = 0;
+	int thumbnailsOffset = 250;
+
+	void upButtonPressed();
+	void downButtonPressed();
+	void exit();
 };
 

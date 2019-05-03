@@ -11,6 +11,8 @@
 class Thumbnail : public ofxMSAInteractiveObject {
 public:
 	ofVideoPlayer video;
+	bool enabled = false;
+	int thumbnailSize = 300;
 
 	void setup(string path) {
 		video.load(path);
@@ -37,11 +39,12 @@ public:
 		else ofSetHexColor(IDLE_COLOR);
 
 		ofRect(x, y, width, height);*/
-		video.draw(x, y);
+		video.draw(x, y, thumbnailSize, thumbnailSize);
 	}
 
 	virtual void onRollOver(int x, int y) {
-		video.setPaused(false);
+		if (enabled)
+			video.setPaused(false);
 	}
 
 	virtual void onRollOut() {
