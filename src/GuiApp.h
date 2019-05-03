@@ -26,7 +26,7 @@ public:
 	ofxButton stopButton;
 
 	ofDirectory dir;
-	vector<Thumbnail> thumbnails;
+	vector<Thumbnail*> thumbnails;
 
 	int initialVideo = 0;
 	int thumbnailsOffset = 250;

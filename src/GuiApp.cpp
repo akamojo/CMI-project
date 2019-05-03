@@ -7,6 +7,12 @@
 
 #include "GuiApp.h"
 
+inline bool ends_with(std::string const & value, std::string const & ending)
+{
+	if (ending.size() > value.size()) return false;
+	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
 void GuiApp::setup(){
 	ofSetVerticalSync(true);
 
@@ -28,17 +34,17 @@ void GuiApp::setup(){
 	dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
 
 				//allocate the vector to have as many ofImages as files
-	if (dir.size()) {
-		thumbnails.assign(dir.size(), Thumbnail());
-	}
 
 	// you can now iterate through the files and load them into the ofImage vector
 	for (int i = 0; i < (int)dir.size(); i++) {
 		cout << dir.getPath(i) << endl;
-		thumbnails[i].setup(dir.getPath(i));//, *this);
+		Thumbnail *t = new Thumbnail();
 
-		thumbnails[i].set(300, 20 + (i%3) * (thumbnails[0].thumbnailSize + 10), 
-			thumbnails[i].thumbnailSize, thumbnails[i].thumbnailSize);
+		thumbnails.push_back(t);
+		thumbnails[i]->setup(dir.getPath(i));//, *this);
+
+		thumbnails[i]->set(300, 20 + (i%3) * (thumbnails[0]->thumbnailSize + 10), 
+			thumbnails[i]->thumbnailSize, thumbnails[i]->thumbnailSize);
 	}
 
 	playButton.addListener(this, &GuiApp::playButtonPressed);
@@ -51,15 +57,15 @@ void GuiApp::setup(){
 	details.add(pauseButton.setup("pause"));
 	details.add(stopButton.setup("stop"));
 
-	playVideo(thumbnails[3].name);
+	playVideo(thumbnails[3]->name);
 
 	ofSetVerticalSync(false);
 }
 
 void GuiApp::update(){
 	for (int i = 0; i < (int)thumbnails.size(); i++) {
-		thumbnails[i].video.update();
-		thumbnails[i].update();
+		thumbnails[i]->video.update();
+		thumbnails[i]->update();
 	}
 	mainPlayer.update();
 }
@@ -73,13 +79,13 @@ void GuiApp::draw(){
 
 		for (int i = initialVideo; i < initialVideo + 3; i++) {
 			if (i < (int)thumbnails.size() && i >= 0) {
-				thumbnails[i].enabled = true;
-				thumbnails[i].draw(thumbnailsOffset, 
-					20 + (i - initialVideo) * (thumbnails[0].thumbnailSize + 10));
+				thumbnails[i]->enabled = true;
+				thumbnails[i]->draw(thumbnailsOffset, 
+					20 + (i - initialVideo) * (thumbnails[0]->thumbnailSize + 10));
 			}
 		}
 
-		mainPlayer.draw(thumbnailsOffset + thumbnails[0].thumbnailSize + 100, 20);
+		mainPlayer.draw(thumbnailsOffset + thumbnails[0]->thumbnailSize + 100, 20);
 	}
 }
 
@@ -88,16 +94,16 @@ void GuiApp::playVideo(string name) {
 	mainPlayer.setLoopState(OF_LOOP_NORMAL);
 	mainPlayer.play();
 
-	videoName = thumbnails[3].name;
-	details.setPosition(thumbnailsOffset + thumbnails[0].thumbnailSize + 100,
+	videoName = thumbnails[3]->name;
+	details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 100,
 		20 + mainPlayer.getHeight() + 10);
 }
 
 void GuiApp::downButtonPressed() {
-	if (initialVideo + 3 < thumbnails.size()) {
+	if (initialVideo + 3 < (int)thumbnails.size()) {
 		initialVideo += 3;
 		for (int i = 0; i < initialVideo; i++) {
-			thumbnails[i].enabled = false;
+			thumbnails[i]->enabled = false;
 		}
 	}
 }
@@ -105,7 +111,7 @@ void GuiApp::downButtonPressed() {
 void GuiApp::upButtonPressed() {
 	if (initialVideo - 3 >= 0) {
 		for (int i = initialVideo; i < (int)thumbnails.size(); i++) {
-			thumbnails[i].enabled = false;
+			thumbnails[i]->enabled = false;
 		}
 		initialVideo -= 3;
 	}
@@ -115,7 +121,15 @@ void GuiApp::addButtonPressed() {
 	ofFileDialogResult result = ofSystemLoadDialog("Load file");
 	if (result.bSuccess) {
 		string path = result.getPath();
-		// load your file at `path`
+		if (ends_with(path, "mov") || ends_with(path, "mp4")) {
+			Thumbnail *t = new Thumbnail();
+			thumbnails.push_back(t);
+			thumbnails[(int)thumbnails.size() - 1]->setup(path);
+
+			thumbnails[(int)thumbnails.size() - 1]->set(300, 20 + (((int)thumbnails.size() - 1) % 3)
+				* (thumbnails[0]->thumbnailSize + 10),
+				thumbnails[0]->thumbnailSize, thumbnails[0]->thumbnailSize);
+		}
 	}
 }
 
