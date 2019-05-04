@@ -13,6 +13,25 @@ inline bool ends_with(string const & value, string const & ending)
 	return equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
+void GuiApp::checkMetadatas() {
+    for (int i = 0; i < (int)dir.size(); i++) {
+        vector<string> spl = ofSplitString(dir.getPath(i), ".");
+        string xmlFilePath = spl[0] + ".xml";
+        if (xmlHandler.loadFile(xmlFilePath)) {
+            ofLog(OF_LOG_NOTICE, xmlFilePath + " loaded");
+        }
+        else {
+            ofLog(OF_LOG_NOTICE, xmlFilePath + " does not exist");
+
+            int mainPos = xmlHandler.addTag("metadata");
+            xmlHandler.pushTag("metadata");
+            xmlHandler.addValue("name", ofSplitString(dir.getName(i), ".")[0]);
+            xmlHandler.popTag();
+            xmlHandler.saveFile(xmlFilePath);
+        }
+    }
+}
+
 void GuiApp::setup(){
 	ofSetVerticalSync(true);
 
@@ -30,10 +49,9 @@ void GuiApp::setup(){
 	dir.listDir("videos/");
 	dir.allowExt("mov");
 	dir.allowExt("mp4");
-
 	dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
 
-				//allocate the vector to have as many ofImages as files
+    checkMetadatas();
 
 	// you can now iterate through the files and load them into the ofImage vector
 	for (int i = 0; i < (int)dir.size(); i++) {
@@ -41,9 +59,7 @@ void GuiApp::setup(){
 		Thumbnail *t = new Thumbnail();
 
 		thumbnails.push_back(t);
-
 		thumbnails[i]->setup(dir.getPath(i));
-
         thumbnails[i]->set(thumbnailsOffset, 20 + (i%3) * (thumbnails[0]->thumbnailSize + 10),
 			thumbnails[i]->thumbnailSize, thumbnails[i]->thumbnailSize);
 	}

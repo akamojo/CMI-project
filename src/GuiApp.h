@@ -3,6 +3,8 @@
 #include "ofxGui.h"
 #include "Thumbnail.h"
 
+#include <ofxXmlSettings.h>
+
 class GuiApp: public ofBaseApp {
 public:
 	void setup();
@@ -29,9 +31,13 @@ public:
 	ofDirectory dir;
 	vector<Thumbnail*> thumbnails;
 
+    ofxXmlSettings xmlHandler;
+
 	int initialVideo = 0;
     int thumbnailsOffset = 10;
 	int currentVideo = 0;
+
+    void checkMetadatas();
 
 	void upButtonPressed();
 	void downButtonPressed();
