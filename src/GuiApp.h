@@ -2,6 +2,7 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "Thumbnail.h"
+#include "luminanceextractor.h"
 
 #include <ofxXmlSettings.h>
 
@@ -23,6 +24,7 @@ public:
 	ofxPanel details;
 
 	ofxLabel videoName;
+    ofxLabel videoLuminance;
 
 	ofxButton playButton;
 	ofxButton pauseButton;
@@ -32,6 +34,7 @@ public:
 	vector<Thumbnail*> thumbnails;
 
     ofxXmlSettings xmlHandler;
+    LuminanceExtractor luminanceExtractor;
 
 	int initialVideo = 0;
     int thumbnailsOffset = 10;

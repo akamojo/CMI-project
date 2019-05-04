@@ -19,6 +19,11 @@ void GuiApp::checkMetadatas() {
         string xmlFilePath = spl[0] + ".xml";
         if (xmlHandler.loadFile(xmlFilePath)) {
             ofLog(OF_LOG_NOTICE, xmlFilePath + " loaded");
+            double lumi = xmlHandler.getValue("luminance", -1.0);
+            if (lumi == -1.0) {
+                ofLog(OF_LOG_NOTICE, xmlFilePath + " luminance missing");
+                // ? do something ?
+            }
         }
         else {
             ofLog(OF_LOG_NOTICE, xmlFilePath + " does not exist");
@@ -27,6 +32,7 @@ void GuiApp::checkMetadatas() {
             xmlHandler.pushTag("metadata");
             xmlHandler.addValue("name", ofSplitString(dir.getName(i), ".")[0]);
             xmlHandler.popTag();
+
             xmlHandler.saveFile(xmlFilePath);
         }
     }
@@ -46,9 +52,9 @@ void GuiApp::setup(){
 
     ofBackground(255, 0, 144);
 
-	dir.listDir("videos/");
-	dir.allowExt("mov");
-	dir.allowExt("mp4");
+    dir.allowExt("mov");
+    dir.allowExt("mp4");
+    dir.listDir("videos/");
 	dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
 
     checkMetadatas();
@@ -74,7 +80,8 @@ void GuiApp::setup(){
 	details.add(pauseButton.setup("pause"));
 	details.add(stopButton.setup("stop"));
 
-	cout << "Press space to see details of subsequent video" << endl;
+    details.add(videoLuminance.setup("lumi", ""));
+
 	playVideo();
 
 	ofSetVerticalSync(false);
@@ -110,12 +117,19 @@ void GuiApp::draw(){
 void GuiApp::playVideo() {
 	if (currentVideo % 3 + initialVideo < thumbnails.size()) {
 		mainPlayer.load(thumbnails[currentVideo % 3 + initialVideo]->name);
-		mainPlayer.setLoopState(OF_LOOP_NORMAL);
-		mainPlayer.play();
 
-		videoName = thumbnails[currentVideo % 3 + initialVideo]->name;
+        if (xmlHandler.loadFile(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml")) {
+            xmlHandler.pushTag("metadata");
+            videoName = xmlHandler.getValue("name", "?");
+            videoLuminance = ofToString(xmlHandler.getValue("luminance", -1.0));
+        }
+
+        mainPlayer.setLoopState(OF_LOOP_NORMAL);
+        mainPlayer.play();
+
         details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50,
             20 + mainPlayerHeight + 10);
+
 	}
 }
 
