@@ -1,13 +1,11 @@
-/* Refer to the README.md in the example's root folder for more information on usage */
-
 #pragma once
 
 #include "ofMain.h"
+#include "GuiApp.h"
+#include "ofxCvHaarFinder.h"
 
 class ofApp : public ofBaseApp{
-	
 	public:
-		
 		void setup();
 		void update();
 		void draw();
@@ -25,17 +23,14 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);		
-		
-		// we will have a dynamic number of images, based on the content of a directory:
-		ofDirectory dir;
-        vector<ofVideoPlayer> videoPlayers;
-		
-        int currentVideo;
 
-        // webcam display variables
-        ofVideoGrabber vidGrabber;
-        int camWidth;
-        int camHeight;
-		
+		ofImage colorImg;
+
+		ofxCvHaarFinder finder;
+
+		ofVideoGrabber vidGrabber;
+		int camWidth;
+		int camHeight;
+
+		shared_ptr<GuiApp> gui;
 };
-
