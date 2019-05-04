@@ -1,5 +1,4 @@
 #pragma once
-
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "Thumbnail.h"
@@ -11,6 +10,8 @@ public:
 	void draw();
 
 	ofVideoPlayer mainPlayer;
+    int mainPlayerWidth = 500;
+    int mainPlayerHeight = 400;
 
 	ofxButton upButton;
 	ofxButton downButton;
@@ -29,7 +30,7 @@ public:
 	vector<Thumbnail*> thumbnails;
 
 	int initialVideo = 0;
-	int thumbnailsOffset = 250;
+    int thumbnailsOffset = 10;
 	int currentVideo = 0;
 
 	void upButtonPressed();

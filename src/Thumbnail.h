@@ -13,7 +13,7 @@ class Thumbnail : public ofxMSAInteractiveObject {
 public:
 	ofVideoPlayer video;
 	bool enabled = false;
-	int thumbnailSize = 300;
+    int thumbnailSize = 200;
 	string name;
 
 	void setup(string path) {

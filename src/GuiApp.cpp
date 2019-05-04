@@ -23,9 +23,9 @@ void GuiApp::setup(){
 	nav.setup();
 	nav.add(upButton.setup("up"));
 	nav.add(downButton.setup("down"));
-	nav.add(addButton.setup("add new"));
+    nav.add(addButton.setup("add new"));
 
-	ofBackground(255, 0, 144);
+    ofBackground(255, 0, 144);
 
 	dir.listDir("videos/");
 	dir.allowExt("mov");
@@ -44,7 +44,7 @@ void GuiApp::setup(){
 
 		thumbnails[i]->setup(dir.getPath(i));
 
-		thumbnails[i]->set(300, 20 + (i%3) * (thumbnails[0]->thumbnailSize + 10), 
+        thumbnails[i]->set(thumbnailsOffset, 20 + (i%3) * (thumbnails[0]->thumbnailSize + 10),
 			thumbnails[i]->thumbnailSize, thumbnails[i]->thumbnailSize);
 	}
 
@@ -83,11 +83,11 @@ void GuiApp::draw(){
 			if (i < (int)thumbnails.size() && i >= 0) {
 				thumbnails[i]->enabled = true;
 				thumbnails[i]->draw(thumbnailsOffset, 
-					20 + (i - initialVideo) * (thumbnails[0]->thumbnailSize + 10));
+                    20 + 100 + (i - initialVideo) * (thumbnails[0]->thumbnailSize + 10));
 			}
 		}
 
-		mainPlayer.draw(thumbnailsOffset + thumbnails[0]->thumbnailSize + 100, 20);
+        mainPlayer.draw(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50, 20, mainPlayerWidth, mainPlayerHeight);
 	}
 }
 
@@ -98,8 +98,8 @@ void GuiApp::playVideo() {
 		mainPlayer.play();
 
 		videoName = thumbnails[currentVideo % 3 + initialVideo]->name;
-		details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 100,
-			20 + mainPlayer.getHeight() + 10);
+        details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50,
+            20 + mainPlayerHeight + 10);
 	}
 }
 
@@ -138,9 +138,10 @@ void GuiApp::addButtonPressed() {
 
 			thumbnails[(int)thumbnails.size() - 1]->setup(path);
 
-			thumbnails[(int)thumbnails.size() - 1]->set(300, 20 + (((int)thumbnails.size() - 1) % 3)
+            thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + (((int)thumbnails.size() - 1) % 3)
 				* (thumbnails[0]->thumbnailSize + 10),
 				thumbnails[0]->thumbnailSize, thumbnails[0]->thumbnailSize);
+
 		}
 	}
 }
