@@ -11,6 +11,8 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+
+        void setupWebcam();
 		
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -26,9 +28,14 @@ class ofApp : public ofBaseApp{
 		
 		// we will have a dynamic number of images, based on the content of a directory:
 		ofDirectory dir;
-		vector<ofVideoPlayer> images;
+        vector<ofVideoPlayer> videoPlayers;
 		
-		int currentImage;
+        int currentVideo;
+
+        // webcam display variables
+        ofVideoGrabber vidGrabber;
+        int camWidth;
+        int camHeight;
 		
 };
 

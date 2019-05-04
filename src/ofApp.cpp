@@ -3,86 +3,100 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    ofBackground(ofColor::whiteSmoke);
+
+    this->setupWebcam();
+
 	dir.listDir("videos/");
 	dir.allowExt("mov");
 	dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
 
 	//allocate the vector to have as many ofImages as files
 	if( dir.size() ){
-		images.assign(dir.size(), ofVideoPlayer());
+        videoPlayers.assign(dir.size(), ofVideoPlayer());
 	}
 
 	// you can now iterate through the files and load them into the ofImage vector
 	for(int i = 0; i < (int)dir.size(); i++){
 		cout << dir.getPath(i) << endl;
-		images[i].load(dir.getPath(i));
-		images[i].setLoopState(OF_LOOP_NORMAL);
-		images[i].play();
-		images[i].setPaused(true);
+        videoPlayers[i].load(dir.getPath(i));
+        videoPlayers[i].setLoopState(OF_LOOP_NORMAL);
+        videoPlayers[i].play();
+        videoPlayers[i].setPaused(true);
 	}
-	currentImage = 0;
-	images[currentImage].setPaused(false);
+    currentVideo = 0;
+    videoPlayers[currentVideo].setPaused(false);
 
-	ofBackground(ofColor::white);
+}
+
+//--------------------------------------------------------------
+void ofApp::setupWebcam() {
+    camWidth = 200;  // try to grab at this size.
+    camHeight = 200;
+
+    //get back a list of devices.
+    vector<ofVideoDevice> devices = vidGrabber.listDevices();
+
+    for (size_t i = 0; i < devices.size(); i++){
+        if (devices[i].bAvailable){
+            //log the device
+            ofLogNotice() << devices[i].id << ": " << devices[i].deviceName;
+        } else {
+            //log the device and note it as unavailable
+            ofLogNotice() << devices[i].id << ": " << devices[i].deviceName << " - unavailable ";
+        }
+    }
+
+    vidGrabber.setDeviceID(0);
+    vidGrabber.setDesiredFrameRate(60);
+    vidGrabber.initGrabber(camWidth, camHeight);
+
+    ofSetVerticalSync(true);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	for (int i = 0; i < (int)images.size(); i++) {
-		images[i].update();
+    for (int i = 0; i < (int)videoPlayers.size(); i++) {
+        videoPlayers[i].update();
 	}
+
+//    ofBackground(100, 100, 100);
+    vidGrabber.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-	/*if (dir.size() > 0){
-		ofSetColor(ofColor::white);
-		images[currentImage].draw(300,50);
-		//images[currentImage].setPaused(false);
+    int vWidth = 100;
+    int vHeight = 100;
 
-		ofSetColor(ofColor::gray);
-		string pathInfo = dir.getName(currentImage) + " " + dir.getPath(currentImage) + "\n\n" +
-			"press any key to advance current image\n\n" +
-			"many thanks to hikaru furuhashi for the OFs";
-		ofDrawBitmapString(pathInfo, 300, images[currentImage].getHeight() + 80);
-	}
+    vidGrabber.draw(200, 200);
 
-	ofSetColor(ofColor::gray);
-	for(int i = 0; i < (int)dir.size(); i++){
-		if(i == currentImage) {
-			ofSetColor(ofColor::red);
-		}	else {
-			ofSetColor(ofColor::black);
-		}
-		string fileInfo = "file " + ofToString(i + 1) + " = " + dir.getName(i);
-		ofDrawBitmapString(fileInfo, 50,i * 20 + 50);
-	}*/
-
-	if (dir.size() > 0) {
-		ofSetColor(ofColor::white);
+//	if (dir.size() > 0) {
+//		ofSetColor(ofColor::white);
 		
-		for (int i = 0; i < (int)images.size(); i++) {
-			images[i].draw(20, 20 + i * (images[0].getHeight() + 10));
-			
-			/*vidGrabber.draw(20, 20);
-			videoTexture.draw(20 + camWidth, 20, camWidth, camHeight);
+//        for (int i = 0; i < (int)videoPlayers.size(); i++) {
+////			videoPlayers[i].draw(20, 20 + i * (videoPlayers[0].getHeight() + 10) );
+//            videoPlayers[i].draw(20, 20 + i * (vHeight + 10), vWidth, vHeight );
 
-			fingerMovie.draw(20 + 2 * camWidth, 20, 2 * camWidth, 2 * camHeight);*/
-		}
+//			/*vidGrabber.draw(20, 20);
+//			videoTexture.draw(20 + camWidth, 20, camWidth, camHeight);
+
+//			fingerMovie.draw(20 + 2 * camWidth, 20, 2 * camWidth, 2 * camHeight);*/
+//		}
 		
-	}
+//	}
 
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	if (dir.size() > 0){
-		images[currentImage].setPaused(true);
-		currentImage++;
-		currentImage %= dir.size();
+        videoPlayers[currentVideo].setPaused(true);
+        currentVideo++;
+        currentVideo %= dir.size();
 
-		images[currentImage].setPaused(false);
+        videoPlayers[currentVideo].setPaused(false);
 	}
 }
 
