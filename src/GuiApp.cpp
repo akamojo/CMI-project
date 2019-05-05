@@ -21,7 +21,6 @@ void GuiApp::checkMetadatas() {
             ofLog(OF_LOG_NOTICE, xmlFilePath + " loaded");
             double lumi = xmlHandler.getValue("luminance", -1.0);
             if (lumi == -1.0) {
-                ofLog(OF_LOG_NOTICE, xmlFilePath + " luminance missing");
                 // ? do something ?
             }
         }
@@ -116,16 +115,20 @@ void GuiApp::draw(){
 
 void GuiApp::playVideo() {
 	if (currentVideo % 3 + initialVideo < thumbnails.size()) {
-		mainPlayer.load(thumbnails[currentVideo % 3 + initialVideo]->name);
+
+        mainPlayer.load(thumbnails[currentVideo % 3 + initialVideo]->name);
+        mainPlayer.setLoopState(OF_LOOP_NORMAL);
+        mainPlayer.play();
 
         if (xmlHandler.loadFile(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml")) {
             xmlHandler.pushTag("metadata");
             videoName = xmlHandler.getValue("name", "?");
-            videoLuminance = ofToString(xmlHandler.getValue("luminance", -1.0));
+            double getLumi = xmlHandler.getValue("luminance", -1.0);
+            videoLuminance = ofToString(getLumi);
+            if (getLumi == -1.0) {
+                getLumi = luminanceExtractor.calculate(mainPlayer);
+            }
         }
-
-        mainPlayer.setLoopState(OF_LOOP_NORMAL);
-        mainPlayer.play();
 
         details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50,
             20 + mainPlayerHeight + 10);

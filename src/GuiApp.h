@@ -23,7 +23,7 @@ public:
 	ofxPanel nav;
 	ofxPanel details;
 
-	ofxLabel videoName;
+    ofxLabel videoName;
     ofxLabel videoLuminance;
 
 	ofxButton playButton;

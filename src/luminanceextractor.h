@@ -16,6 +16,8 @@ private:
     const double gc = 0.7152;
     const double bc = 0.0722;
 
+    const int skipStep = 30;
+
     double calculatePixel(ofPixels, int i, int j, int vidWidth, int nChannels);
 };
 

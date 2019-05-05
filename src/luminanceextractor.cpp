@@ -4,9 +4,9 @@ LuminanceExtractor::LuminanceExtractor() {
 }
 
 double LuminanceExtractor::calculatePixel(ofPixels pixels, int i, int j, int vidWidth, int nChannels) {
-    double red     = (double) pixels[(j * vidWidth + i) * nChannels    ];
-    double green   = (double) pixels[(j * vidWidth + i) * nChannels + 1];
-    double blue    = (double) pixels[(j * vidWidth + i) * nChannels + 2];
+    double red = (double) pixels[(j * vidWidth + i) * nChannels    ];
+    double green =  (double) pixels[(j * vidWidth + i) * nChannels + 1];
+    double blue = (double) pixels[(j * vidWidth + i) * nChannels + 2];
 
     return rc * red + gc * green + bc * blue;
 }
@@ -19,15 +19,17 @@ double LuminanceExtractor::calculate(ofVideoPlayer vidPlayer) {
     int vidHeight = pixels.getHeight();
     int nChannels = pixels.getNumChannels();
 
+    ofLog(OF_LOG_NOTICE, ofToString(vidWidth));
     double currentLumi;
-    for (int i = 0; i < vidWidth; ++i) {
-        for (int j = 0; j < vidHeight; ++j) {
+    for (int i = 0; i < vidWidth; i += skipStep) {
+        for (int j = 0; j < vidHeight; j += skipStep) {
             currentLumi = calculatePixel(pixels, i, j, vidWidth, nChannels);
             luminanceSum += currentLumi;
         }
     }
-    return luminanceSum / (double)(vidWidth * vidHeight);
+    return luminanceSum / (double)(vidWidth/skipStep * vidHeight/skipStep);
 }
+
 
 void LuminanceExtractor::convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight) {
 
