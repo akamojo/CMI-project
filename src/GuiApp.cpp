@@ -146,7 +146,7 @@ void GuiApp::draw(){
 }
 
 void GuiApp::playVideo() {
-    if (currentVideo - thumbnailIdxOffset < thumbnails.size()) {
+    if (currentVideo < thumbnails.size()) {
 
         string currentName = thumbnails[currentVideo]->name;
 
@@ -234,8 +234,13 @@ void GuiApp::stopButtonPressed() {
 void GuiApp::keyPressed(int key) {
 
 	currentVideo++;
+
     currentVideo %= 3;
     currentVideo += thumbnailIdxOffset;
+
+    if (currentVideo == dir.size()) {
+        currentVideo = thumbnailIdxOffset;
+    }
 
 	playVideo();
 }
