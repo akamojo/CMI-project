@@ -22,7 +22,7 @@ private:
     const double gc = 0.7152;
     const double bc = 0.0722;
 
-    const int skipStep = 30;
+    const int skipStep = 50;
 
     int frameCounter;
     const int frameStep = 50;

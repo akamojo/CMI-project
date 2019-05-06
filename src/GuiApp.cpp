@@ -65,9 +65,9 @@ void GuiApp::setup(){
 
 		thumbnails.push_back(t);
 		thumbnails[i]->setup(dir.getPath(i));
-        thumbnails[i]->set(thumbnailsOffset, 20 + (i%3) * (thumbnails[0]->thumbnailSize + 10),
-			thumbnails[i]->thumbnailSize, thumbnails[i]->thumbnailSize);
-	}
+        thumbnails[i]->set(thumbnailsOffset, 20 + 100 + (i%3) * (thumbnails[0]->thumbnailSize + 10),
+            thumbnails[i]->thumbnailSize, thumbnails[i]->thumbnailSize);
+    }
 
 	playButton.addListener(this, &GuiApp::playButtonPressed);
 	pauseButton.addListener(this, &GuiApp::pauseButtonPressed);

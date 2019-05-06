@@ -28,7 +28,6 @@ void LuminanceExtractor::threadedFunction() {
             if (frameCounter % frameStep == 0) {
                 currentLumi = this->calculateFrame();
                 luminance += currentLumi;
-                ofLog(OF_LOG_NOTICE, ofToString(videoPlayer.getPosition()));
             }
         }
     }
