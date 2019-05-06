@@ -149,15 +149,12 @@ void GuiApp::playVideo() {
 
     if (currentVideo < thumbnails.size() && currentVideo >= 0) {
         string currentName = thumbnails[currentVideo]->name;
-		cout << currentName << endl;
-
-		//cout << ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml" << endl;
 
         mainPlayer.load(currentName);
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
         mainPlayer.play();
 
-        if (xmlHandler.loadFile(ofSplitString(currentName, ".")[0] + ".xml")) {
+        if (xmlHandler.loadFile(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml")) {
 			
 			xmlHandler.pushTag("metadata");
             videoName = xmlHandler.getValue("name", "?");
@@ -167,7 +164,7 @@ void GuiApp::playVideo() {
 			if (getLumi == -1.0) {
                 if (!waitsForLuminance) {
                     waitsForLuminance = true;
-                    luminanceExtractor.setup(currentName);
+                    luminanceExtractor.setup(dir.getPath(currentVideo));
                     luminanceExtractor.startThread();
                 }
             }
