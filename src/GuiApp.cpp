@@ -216,9 +216,6 @@ void GuiApp::addButtonPressed() {
             thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + 100 + (((int)thumbnails.size() - 1) % 3)
 				* (thumbnails[0]->thumbnailSize + 10),
 				thumbnails[0]->thumbnailSize, thumbnails[0]->thumbnailSize);
-
-			//thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + 100 + ((int)thumbnails.size() - 1 % 3) * (thumbnails[0]->thumbnailSize + 10),
-			//	thumbnails[(int)thumbnails.size() - 1]->thumbnailSize, thumbnails[(int)thumbnails.size() - 1]->thumbnailSize);
 		}
 	}
 }
