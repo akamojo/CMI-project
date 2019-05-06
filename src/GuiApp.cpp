@@ -14,7 +14,9 @@ inline bool ends_with(string const & value, string const & ending)
 }
 
 void GuiApp::checkMetadatas() {
+
     for (int i = 0; i < (int)dir.size(); i++) {
+
         vector<string> spl = ofSplitString(dir.getPath(i), ".");
         string xmlFilePath = spl[0] + ".xml";
         if (xmlHandler.loadFile(xmlFilePath)) {
@@ -33,6 +35,7 @@ void GuiApp::checkMetadatas() {
             xmlHandler.popTag();
 
             xmlHandler.saveFile(xmlFilePath);
+            xmlHandler.clear();
         }
     }
 }
@@ -130,11 +133,11 @@ void GuiApp::draw(){
 	if (dir.size() > 0) {
 		ofSetColor(ofColor::white);
 
-		for (int i = initialVideo; i < initialVideo + 3; i++) {
+        for (int i = thumbnailIdxOffset; i < thumbnailIdxOffset + 3; i++) {
 			if (i < (int)thumbnails.size() && i >= 0) {
 				thumbnails[i]->enabled = true;
 				thumbnails[i]->draw(thumbnailsOffset, 
-                    20 + 100 + (i - initialVideo) * (thumbnails[0]->thumbnailSize + 10));
+                    20 + 100 + (i - thumbnailIdxOffset) * (thumbnails[0]->thumbnailSize + 10));
 			}
 		}
 
@@ -143,10 +146,9 @@ void GuiApp::draw(){
 }
 
 void GuiApp::playVideo() {
-	if (currentVideo % 3 + initialVideo < thumbnails.size()) {
+    if (currentVideo - thumbnailIdxOffset < thumbnails.size()) {
 
-        string currentName = thumbnails[currentVideo % 3 + initialVideo]->name;
-        // current idx?
+        string currentName = thumbnails[currentVideo]->name;
 
         mainPlayer.load(currentName);
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
@@ -173,11 +175,12 @@ void GuiApp::playVideo() {
 }
 
 void GuiApp::downButtonPressed() {
-	if (initialVideo + 3 < (int)thumbnails.size()) {
-		currentVideo = 0;
-		initialVideo += 3;
+    if (thumbnailIdxOffset + 3 < (int)thumbnails.size()) {
 
-		for (int i = 0; i < initialVideo; i++)
+        thumbnailIdxOffset += 3;
+        currentVideo = thumbnailIdxOffset;
+
+        for (int i = 0; i < thumbnailIdxOffset; i++)
 			thumbnails[i]->enabled = false;
 		
 		playVideo();
@@ -186,13 +189,14 @@ void GuiApp::downButtonPressed() {
 
 void GuiApp::upButtonPressed() {
 
-	if (initialVideo - 3 >= 0) {
-		currentVideo = 0;
+    if (thumbnailIdxOffset - 3 >= 0) {
 
-		for (int i = initialVideo; i < (int)thumbnails.size(); i++) 
+        thumbnailIdxOffset -= 3;
+        currentVideo = thumbnailIdxOffset;
+
+        for (int i = thumbnailIdxOffset; i < (int)thumbnails.size(); i++)
 			thumbnails[i]->enabled = false;
 		
-		initialVideo -= 3;
 		playVideo();
 	}
 }
@@ -228,7 +232,11 @@ void GuiApp::stopButtonPressed() {
 }
 
 void GuiApp::keyPressed(int key) {
+
 	currentVideo++;
+    currentVideo %= 3;
+    currentVideo += thumbnailIdxOffset;
+
 	playVideo();
 }
 

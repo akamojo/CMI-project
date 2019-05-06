@@ -25,6 +25,7 @@ void LuminanceExtractor::threadedFunction() {
     videoPlayer.load(videoFilePath);
     videoPlayer.setLoopState(OF_LOOP_NONE);
     videoPlayer.play();
+    ofLog(OF_LOG_NOTICE, "LumExtractor starts for " + videoFilePath + "...");
 
     double currentLumi;
     while (true) {

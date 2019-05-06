@@ -24,10 +24,10 @@ private:
     const double gc = 0.7152;
     const double bc = 0.0722;
 
-    const int skipStep = 50;
+    const int skipStep = 100;
 
     int frameCounter;
-    const int frameStep = 50;
+    const int frameStep = 100;
 
     double luminance;
     bool ready;

@@ -37,7 +37,7 @@ public:
     LuminanceExtractor luminanceExtractor;
     bool waitsForLuminance = false;
 
-	int initialVideo = 0;
+    int thumbnailIdxOffset = 0;
     int thumbnailsOffset = 10;
 	int currentVideo = 0;
 
