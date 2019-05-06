@@ -10,13 +10,13 @@ int main( ){
 
     // WemCamera View
 	settings.setSize(320, 240);
-    settings.setPosition(ofVec2f(1300, 0));
+    settings.setPosition(ofVec2f(1300, 50));
 	settings.resizable = true;
 	shared_ptr<ofAppBaseWindow> mainWindow = ofCreateWindow(settings);
 
     // Video Library View
 	settings.setSize(1300, 950);
-    settings.setPosition(ofVec2f(65, 0));
+    settings.setPosition(ofVec2f(65, 50));
 	settings.resizable = false;
 	shared_ptr<ofAppBaseWindow> guiWindow = ofCreateWindow(settings);
 

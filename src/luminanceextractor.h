@@ -2,6 +2,7 @@
 #define LUMINANCEEXTRACTOR_H
 
 #include <ofVideoPlayer.h>
+#include "ofMain.h"
 
 class LuminanceExtractor : public ofThread
 {

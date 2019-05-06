@@ -146,23 +146,28 @@ void GuiApp::draw(){
 }
 
 void GuiApp::playVideo() {
-    if (currentVideo - thumbnailIdxOffset < thumbnails.size()) {
 
+    if (currentVideo < thumbnails.size() && currentVideo >= 0) {
         string currentName = thumbnails[currentVideo]->name;
+		cout << currentName << endl;
+
+		//cout << ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml" << endl;
 
         mainPlayer.load(currentName);
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
         mainPlayer.play();
 
-        if (xmlHandler.loadFile(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml")) {
-            xmlHandler.pushTag("metadata");
+        if (xmlHandler.loadFile(ofSplitString(currentName, ".")[0] + ".xml")) {
+			
+			xmlHandler.pushTag("metadata");
             videoName = xmlHandler.getValue("name", "?");
             double getLumi = xmlHandler.getValue("luminance", -1.0);
             videoLuminance = ofToString(getLumi);
-            if (getLumi == -1.0) {
+            
+			if (getLumi == -1.0) {
                 if (!waitsForLuminance) {
                     waitsForLuminance = true;
-                    luminanceExtractor.setup(dir.getPath(currentVideo));
+                    luminanceExtractor.setup(currentName);
                     luminanceExtractor.startThread();
                 }
             }
@@ -211,9 +216,12 @@ void GuiApp::addButtonPressed() {
 
 			thumbnails[(int)thumbnails.size() - 1]->setup(path);
 
-            thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + (((int)thumbnails.size() - 1) % 3)
+            thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + 100 + (((int)thumbnails.size() - 1) % 3)
 				* (thumbnails[0]->thumbnailSize + 10),
 				thumbnails[0]->thumbnailSize, thumbnails[0]->thumbnailSize);
+
+			//thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + 100 + ((int)thumbnails.size() - 1 % 3) * (thumbnails[0]->thumbnailSize + 10),
+			//	thumbnails[(int)thumbnails.size() - 1]->thumbnailSize, thumbnails[(int)thumbnails.size() - 1]->thumbnailSize);
 		}
 	}
 }
