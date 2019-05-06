@@ -242,8 +242,13 @@ void GuiApp::stopButtonPressed() {
 void GuiApp::keyPressed(int key) {
 
 	currentVideo++;
+
     currentVideo %= 3;
     currentVideo += thumbnailIdxOffset;
+
+    if (currentVideo == dir.size()) {
+        currentVideo = thumbnailIdxOffset;
+    }
 
 	playVideo();
 }
