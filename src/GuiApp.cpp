@@ -1,9 +1,9 @@
 /*
- * GuiApp.cpp
- *
- *  Created on: Oct 28, 2014
- *      Author: arturo
- */
+* GuiApp.cpp
+*
+*  Created on: Oct 28, 2014
+*      Author: arturo
+*/
 
 #include "GuiApp.h"
 #include <exception>
@@ -20,13 +20,13 @@ void copyFile(string const & SRC, string const & DEST)
 {
 	filesystem::path sourceFile = SRC;
 	filesystem::path targetParent = DEST;
-	auto target = targetParent / sourceFile.filename(); 
+	auto target = targetParent / sourceFile.filename();
 
-	try 
+	try
 	{
 		filesystem::copy_file(sourceFile, target, filesystem::copy_option::overwrite_if_exists);
 	}
-	catch (std::exception& e) 
+	catch (std::exception& e)
 	{
 		cout << e.what();
 	}
@@ -40,32 +40,32 @@ string splitFilename(const std::string& str)
 
 void GuiApp::checkMetadatas() {
 
-    for (int i = 0; i < (int)dir.size(); i++) {
+	for (int i = 0; i < (int)dir.size(); i++) {
 
-        vector<string> spl = ofSplitString(dir.getPath(i), ".");
-        string xmlFilePath = spl[0] + ".xml";
-        if (xmlHandler.loadFile(xmlFilePath)) {
-            ofLog(OF_LOG_NOTICE, xmlFilePath + " loaded");
-            double lumi = xmlHandler.getValue("luminance", -1.0);
-            if (lumi == -1.0) {
-                // ? do something ? or not?
-            }
-        }
-        else {
-            ofLog(OF_LOG_NOTICE, xmlFilePath + " does not exist");
+		vector<string> spl = ofSplitString(dir.getPath(i), ".");
+		string xmlFilePath = spl[0] + ".xml";
+		if (xmlHandler.loadFile(xmlFilePath)) {
+			ofLog(OF_LOG_NOTICE, xmlFilePath + " loaded");
+			double lumi = xmlHandler.getValue("luminance", -1.0);
+			if (lumi == -1.0) {
+				// ? do something ? or not?
+			}
+		}
+		else {
+			ofLog(OF_LOG_NOTICE, xmlFilePath + " does not exist");
 
-            int mainPos = xmlHandler.addTag("metadata");
-            xmlHandler.pushTag("metadata");
-            xmlHandler.addValue("name", ofSplitString(dir.getName(i), ".")[0]);
-            xmlHandler.popTag();
+			int mainPos = xmlHandler.addTag("metadata");
+			xmlHandler.pushTag("metadata");
+			xmlHandler.addValue("name", ofSplitString(dir.getName(i), ".")[0]);
+			xmlHandler.popTag();
 
-            xmlHandler.saveFile(xmlFilePath);
-            xmlHandler.clear();
-        }
-    }
+			xmlHandler.saveFile(xmlFilePath);
+			xmlHandler.clear();
+		}
+	}
 }
 
-void GuiApp::setup(){
+void GuiApp::setup() {
 	ofSetVerticalSync(true);
 
 	upButton.addListener(this, &GuiApp::upButtonPressed);
@@ -75,16 +75,16 @@ void GuiApp::setup(){
 	nav.setup();
 	nav.add(upButton.setup("up"));
 	nav.add(downButton.setup("down"));
-    nav.add(addButton.setup("add new"));
+	nav.add(addButton.setup("add new"));
 
-    ofBackground(255, 0, 144);
+	ofBackground(255, 0, 144);
 
-    dir.allowExt("mov");
-    dir.allowExt("mp4");
-    dir.listDir("videos/");
+	dir.allowExt("mov");
+	dir.allowExt("mp4");
+	dir.listDir("videos/");
 	dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
 
-    checkMetadatas();
+	checkMetadatas();
 
 	for (int i = 0; i < (int)dir.size(); i++) {
 		cout << dir.getPath(i) << endl;
@@ -92,9 +92,9 @@ void GuiApp::setup(){
 
 		thumbnails.push_back(t);
 		thumbnails[i]->setup(dir.getPath(i));
-        thumbnails[i]->set(thumbnailsOffset, 20 + 100 + (i%3) * (thumbnails[0]->thumbnailSize + 10),
-            thumbnails[i]->thumbnailSize, thumbnails[i]->thumbnailSize);
-    }
+		thumbnails[i]->set(thumbnailsOffset, 20 + 100 + (i % 3) * (thumbnails[0]->thumbnailSize + 10),
+			thumbnails[i]->thumbnailSize, thumbnails[i]->thumbnailSize);
+	}
 
 	playButton.addListener(this, &GuiApp::playButtonPressed);
 	pauseButton.addListener(this, &GuiApp::pauseButtonPressed);
@@ -106,126 +106,124 @@ void GuiApp::setup(){
 	details.add(pauseButton.setup("pause"));
 	details.add(stopButton.setup("stop"));
 
-    details.add(videoLuminance.setup("lumi", ""));
+	details.add(videoLuminance.setup("lumi", ""));
 
 	playVideo();
 
 	ofSetVerticalSync(false);
 }
 
-void GuiApp::update(){
+void GuiApp::update() {
 	for (int i = 0; i < (int)thumbnails.size(); i++) {
 		thumbnails[i]->video.update();
 		thumbnails[i]->update();
 	}
 	mainPlayer.update();
 
-    if (waitsForLuminance && luminanceExtractor.isReady()) {
-        waitsForLuminance = false;
-        double readLuminance = luminanceExtractor.getLuminance();
-        luminanceExtractor.stopThread();
-        videoLuminance = ofToString(readLuminance);
-        updateXML(currentVideo, "luminance", readLuminance);
-    }
+	if (waitsForLuminance && luminanceExtractor.isReady()) {
+		waitsForLuminance = false;
+		double readLuminance = luminanceExtractor.getLuminance();
+		luminanceExtractor.stopThread();
+		videoLuminance = ofToString(readLuminance);
+		updateXML(currentVideo, "luminance", readLuminance);
+	}
 }
 
 void GuiApp::updateXML(int videoIdx, string tag, double value) {
 
-    string xmlFilePath = ofSplitString(dir.getPath(videoIdx), ".")[0] + ".xml";
-    if (xmlHandler.loadFile(xmlFilePath)) {
+	string xmlFilePath = ofSplitString(dir.getPath(videoIdx), ".")[0] + ".xml";
+	if (xmlHandler.loadFile(xmlFilePath)) {
 
-        xmlHandler.pushTag("metadata");
+		xmlHandler.pushTag("metadata");
 
-        double getCurrentValue = xmlHandler.getValue(tag, -1.0);
-        if (getCurrentValue != -1.0) {
-            xmlHandler.setValue(tag, value);
-            ofLog(OF_LOG_WARNING, "Replaced tag " + tag + " ...");
-        }
-        else {
-            xmlHandler.addValue(tag, value);
-            ofLog(OF_LOG_NOTICE, "Writing " + ofToString(value) + " to XML, " + dir.getPath(videoIdx));
-        }
+		double getCurrentValue = xmlHandler.getValue(tag, -1.0);
+		if (getCurrentValue != -1.0) {
+			xmlHandler.setValue(tag, value);
+			ofLog(OF_LOG_WARNING, "Replaced tag " + tag + " ...");
+		}
+		else {
+			xmlHandler.addValue(tag, value);
+			ofLog(OF_LOG_NOTICE, "Writing " + ofToString(value) + " to XML, " + dir.getPath(videoIdx));
+		}
 
-        xmlHandler.popTag();
-        xmlHandler.saveFile(xmlFilePath);
-    }
+		xmlHandler.popTag();
+		xmlHandler.saveFile(xmlFilePath);
+	}
 }
 
-void GuiApp::draw(){
+void GuiApp::draw() {
 	nav.draw();
 	details.draw();
 
 	if (dir.size() > 0) {
 		ofSetColor(ofColor::white);
 
-        for (int i = thumbnailIdxOffset; i < thumbnailIdxOffset + 3; i++) {
+		for (int i = thumbnailIdxOffset; i < thumbnailIdxOffset + 3; i++) {
 			if (i < (int)thumbnails.size() && i >= 0) {
 				thumbnails[i]->enabled = true;
-				thumbnails[i]->draw(thumbnailsOffset, 
-                    20 + 100 + (i - thumbnailIdxOffset) * (thumbnails[0]->thumbnailSize + 10));
+				thumbnails[i]->draw(thumbnailsOffset,
+					20 + 100 + (i - thumbnailIdxOffset) * (thumbnails[0]->thumbnailSize + 10));
 			}
 		}
 
-        mainPlayer.draw(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50, 20, mainPlayerWidth, mainPlayerHeight);
+		mainPlayer.draw(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50, 20, mainPlayerWidth, mainPlayerHeight);
 	}
 }
 
 void GuiApp::playVideo() {
 
-    if (currentVideo < thumbnails.size() && currentVideo >= 0) {
-        string currentName = thumbnails[currentVideo]->name;
+	if (currentVideo < thumbnails.size() && currentVideo >= 0) {
+		string currentName = thumbnails[currentVideo]->name;
 
-		cout << "tu: " << currentName << endl;
+		mainPlayer.load(currentName);
+		mainPlayer.setLoopState(OF_LOOP_NORMAL);
+		mainPlayer.play();
 
-        mainPlayer.load(currentName);
-        mainPlayer.setLoopState(OF_LOOP_NORMAL);
-        mainPlayer.play();
+		if (xmlHandler.loadFile(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml")) {
 
-        if (xmlHandler.loadFile(ofSplitString(currentName, ".")[0] + ".xml")) {
-			
 			xmlHandler.pushTag("metadata");
-            videoName = xmlHandler.getValue("name", "?");
-            double getLumi = xmlHandler.getValue("luminance", -1.0);
-            videoLuminance = ofToString(getLumi);
-            
-			if (getLumi == -1.0) {
-                if (!waitsForLuminance) {
-                    waitsForLuminance = true;
-                    luminanceExtractor.setup(currentName);
-                    luminanceExtractor.startThread();
-                }
-            }
-        }
+			videoName = xmlHandler.getValue("name", "?");
+			double getLumi = xmlHandler.getValue("luminance", -1.0);
+			videoLuminance = ofToString(getLumi);
 
-        details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50,
-            20 + mainPlayerHeight + 10);
+			if (getLumi == -1.0) {
+				if (!waitsForLuminance) {
+					waitsForLuminance = true;
+					luminanceExtractor.setup(dir.getPath(currentVideo));
+					luminanceExtractor.startThread();
+				}
+			}
+		}
+
+		details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50,
+			20 + mainPlayerHeight + 10);
 
 	}
 }
 
 void GuiApp::downButtonPressed() {
-    if (thumbnailIdxOffset + 3 < (int)thumbnails.size()) {
+	if (thumbnailIdxOffset + 3 < (int)thumbnails.size()) {
 
-        thumbnailIdxOffset += 3;
-        currentVideo = thumbnailIdxOffset;
+		thumbnailIdxOffset += 3;
+		currentVideo = thumbnailIdxOffset;
 
-        for (int i = 0; i < thumbnailIdxOffset; i++)
+		for (int i = 0; i < thumbnailIdxOffset; i++)
 			thumbnails[i]->enabled = false;
-		
+
 		playVideo();
 	}
 }
 
 void GuiApp::upButtonPressed() {
 
-    if (thumbnailIdxOffset - 3 >= 0) {
+	if (thumbnailIdxOffset - 3 >= 0) {
 
-        thumbnailIdxOffset -= 3;
-        currentVideo = thumbnailIdxOffset;
+		thumbnailIdxOffset -= 3;
+		currentVideo = thumbnailIdxOffset;
 
-        for (int i = thumbnailIdxOffset; i < (int)thumbnails.size(); i++)
+		for (int i = thumbnailIdxOffset; i < (int)thumbnails.size(); i++)
 			thumbnails[i]->enabled = false;
-		
+
 		playVideo();
 	}
 }
@@ -241,7 +239,7 @@ void GuiApp::addButtonPressed() {
 			copyFile(path, dir.getAbsolutePath());
 			thumbnails[(int)thumbnails.size() - 1]->setup(dir.path() + splitFilename(path));
 
-            thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + 100 + (((int)thumbnails.size() - 1) % 3)
+			thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + 100 + (((int)thumbnails.size() - 1) % 3)
 				* (thumbnails[0]->thumbnailSize + 10),
 				thumbnails[0]->thumbnailSize, thumbnails[0]->thumbnailSize);
 
@@ -271,19 +269,19 @@ void GuiApp::keyPressed(int key) {
 
 	currentVideo++;
 
-    currentVideo %= 3;
-    currentVideo += thumbnailIdxOffset;
+	currentVideo %= 3;
+	currentVideo += thumbnailIdxOffset;
 
-    if (currentVideo == dir.size()) {
-        currentVideo = thumbnailIdxOffset;
-    }
+	if (currentVideo == dir.size()) {
+		currentVideo = thumbnailIdxOffset;
+	}
 
 	playVideo();
 }
 
 void GuiApp::exit() {
-    if (luminanceExtractor.isThreadRunning())
-        luminanceExtractor.stopThread();
+	if (luminanceExtractor.isThreadRunning())
+		luminanceExtractor.stopThread();
 
 	upButton.removeListener(this, &GuiApp::upButtonPressed);
 	downButton.removeListener(this, &GuiApp::downButtonPressed);
