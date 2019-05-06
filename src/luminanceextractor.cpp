@@ -3,6 +3,41 @@
 LuminanceExtractor::LuminanceExtractor() {
 }
 
+void LuminanceExtractor::setup(std::string path)
+{
+    this->videoFilePath = path;
+    this->frameCounter = 0;
+    this->luminance = -1.0;
+}
+
+void LuminanceExtractor::threadedFunction() {
+    videoPlayer.load(videoFilePath);
+    videoPlayer.setLoopState(OF_LOOP_NONE);
+    videoPlayer.play();
+
+    double currentLumi;
+    while (true) {
+
+        videoPlayer.update();
+        if (videoPlayer.getPosition() >= 0.999) {
+            break;
+        }
+
+        if (videoPlayer.isFrameNew()) {
+            this->frameCounter++;
+            if (frameCounter % frameStep == 0) {
+                currentLumi = this->calculateFrame();
+                luminance += currentLumi;
+                ofLog(OF_LOG_NOTICE, ofToString(videoPlayer.getPosition()));
+            }
+        }
+    }
+
+    luminance = luminance / (double)(frameCounter / frameStep);
+    ofLog(OF_LOG_NOTICE, "LUMI = " + ofToString(luminance));
+
+}
+
 double LuminanceExtractor::calculatePixel(ofPixels pixels, int i, int j, int vidWidth, int nChannels) {
     double red = (double) pixels[(j * vidWidth + i) * nChannels    ];
     double green =  (double) pixels[(j * vidWidth + i) * nChannels + 1];
@@ -11,15 +46,14 @@ double LuminanceExtractor::calculatePixel(ofPixels pixels, int i, int j, int vid
     return rc * red + gc * green + bc * blue;
 }
 
-double LuminanceExtractor::calculate(ofVideoPlayer vidPlayer) {
+double LuminanceExtractor::calculateFrame() {
     double luminanceSum = 0.0;
 
-    ofPixels & pixels = vidPlayer.getPixels();
+    ofPixels & pixels = videoPlayer.getPixels();
     int vidWidth = pixels.getWidth();
     int vidHeight = pixels.getHeight();
     int nChannels = pixels.getNumChannels();
 
-    ofLog(OF_LOG_NOTICE, ofToString(vidWidth));
     double currentLumi;
     for (int i = 0; i < vidWidth; i += skipStep) {
         for (int j = 0; j < vidHeight; j += skipStep) {
@@ -29,7 +63,6 @@ double LuminanceExtractor::calculate(ofVideoPlayer vidPlayer) {
     }
     return luminanceSum / (double)(vidWidth/skipStep * vidHeight/skipStep);
 }
-
 
 void LuminanceExtractor::convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight) {
 

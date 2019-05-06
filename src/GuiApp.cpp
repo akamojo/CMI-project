@@ -126,7 +126,8 @@ void GuiApp::playVideo() {
             double getLumi = xmlHandler.getValue("luminance", -1.0);
             videoLuminance = ofToString(getLumi);
             if (getLumi == -1.0) {
-                getLumi = luminanceExtractor.calculate(mainPlayer);
+                luminanceExtractor.setup(dir.getPath(currentVideo));
+                luminanceExtractor.startThread();
             }
         }
 
@@ -198,6 +199,8 @@ void GuiApp::keyPressed(int key) {
 }
 
 void GuiApp::exit() {
+    luminanceExtractor.stopThread();
+
 	upButton.removeListener(this, &GuiApp::upButtonPressed);
 	downButton.removeListener(this, &GuiApp::downButtonPressed);
 	playButton.removeListener(this, &GuiApp::playButtonPressed);
