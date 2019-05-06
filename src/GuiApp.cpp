@@ -6,11 +6,36 @@
  */
 
 #include "GuiApp.h"
+#include <exception>
+#include <filesystem>
+#include <iostream>
 
-inline bool ends_with(string const & value, string const & ending)
+inline bool endsWith(string const & value, string const & ending)
 {
 	if (ending.size() > value.size()) return false;
 	return equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
+void copyFile(string const & SRC, string const & DEST)
+{
+	filesystem::path sourceFile = SRC;
+	filesystem::path targetParent = DEST;
+	auto target = targetParent / sourceFile.filename(); 
+
+	try 
+	{
+		filesystem::copy_file(sourceFile, target, filesystem::copy_option::overwrite_if_exists);
+	}
+	catch (std::exception& e) 
+	{
+		cout << e.what();
+	}
+}
+
+string splitFilename(const std::string& str)
+{
+	size_t found = str.find_last_of("/\\");
+	return str.substr(found + 1);
 }
 
 void GuiApp::checkMetadatas() {
@@ -150,11 +175,13 @@ void GuiApp::playVideo() {
     if (currentVideo < thumbnails.size() && currentVideo >= 0) {
         string currentName = thumbnails[currentVideo]->name;
 
+		cout << "tu: " << currentName << endl;
+
         mainPlayer.load(currentName);
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
         mainPlayer.play();
 
-        if (xmlHandler.loadFile(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml")) {
+        if (xmlHandler.loadFile(ofSplitString(currentName, ".")[0] + ".xml")) {
 			
 			xmlHandler.pushTag("metadata");
             videoName = xmlHandler.getValue("name", "?");
@@ -164,7 +191,7 @@ void GuiApp::playVideo() {
 			if (getLumi == -1.0) {
                 if (!waitsForLuminance) {
                     waitsForLuminance = true;
-                    luminanceExtractor.setup(dir.getPath(currentVideo));
+                    luminanceExtractor.setup(currentName);
                     luminanceExtractor.startThread();
                 }
             }
@@ -207,15 +234,22 @@ void GuiApp::addButtonPressed() {
 	ofFileDialogResult result = ofSystemLoadDialog("Load file");
 	if (result.bSuccess) {
 		string path = result.getPath();
-		if (ends_with(path, "mov") || ends_with(path, "mp4")) {
+		if (endsWith(path, "mov") || endsWith(path, "mp4")) {
 			Thumbnail *t = new Thumbnail();
 			thumbnails.push_back(t);
 
-			thumbnails[(int)thumbnails.size() - 1]->setup(path);
+			copyFile(path, dir.getAbsolutePath());
+			thumbnails[(int)thumbnails.size() - 1]->setup(dir.path() + splitFilename(path));
 
             thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + 100 + (((int)thumbnails.size() - 1) % 3)
 				* (thumbnails[0]->thumbnailSize + 10),
 				thumbnails[0]->thumbnailSize, thumbnails[0]->thumbnailSize);
+
+			dir.allowExt("mov");
+			dir.allowExt("mp4");
+			dir.listDir("videos/");
+
+			checkMetadatas();
 		}
 	}
 }

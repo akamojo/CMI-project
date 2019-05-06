@@ -4,11 +4,6 @@
 #include "GuiApp.h"
 #include "ofxMSAInteractiveObject.h"
 
-#define		IDLE_COLOR		0xFFFFFF
-#define		OVER_COLOR		0x00FF00
-#define		DOWN_COLOR		0xFF0000
-
-
 class Thumbnail : public ofxMSAInteractiveObject {
 public:
 	ofVideoPlayer video;
@@ -38,11 +33,6 @@ public:
 
 
 	void draw(int x, int y) {
-		/*if (isMousePressed()) ofSetHexColor(DOWN_COLOR);
-		else if (isMouseOver()) ofSetHexColor(OVER_COLOR);
-		else ofSetHexColor(IDLE_COLOR);
-
-		ofRect(x, y, width, height);*/
 		video.draw(x, y, thumbnailSize, thumbnailSize);
 	}
 
