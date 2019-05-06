@@ -21,7 +21,7 @@ void GuiApp::checkMetadatas() {
             ofLog(OF_LOG_NOTICE, xmlFilePath + " loaded");
             double lumi = xmlHandler.getValue("luminance", -1.0);
             if (lumi == -1.0) {
-                // ? do something ?
+                // ? do something ? or not?
             }
         }
         else {
@@ -58,7 +58,6 @@ void GuiApp::setup(){
 
     checkMetadatas();
 
-	// you can now iterate through the files and load them into the ofImage vector
 	for (int i = 0; i < (int)dir.size(); i++) {
 		cout << dir.getPath(i) << endl;
 		Thumbnail *t = new Thumbnail();
@@ -92,6 +91,36 @@ void GuiApp::update(){
 		thumbnails[i]->update();
 	}
 	mainPlayer.update();
+
+    if (waitsForLuminance && luminanceExtractor.isReady()) {
+        waitsForLuminance = false;
+        double readLuminance = luminanceExtractor.getLuminance();
+        luminanceExtractor.stopThread();
+        videoLuminance = ofToString(readLuminance);
+        updateXML(currentVideo, "luminance", readLuminance);
+    }
+}
+
+void GuiApp::updateXML(int videoIdx, string tag, double value) {
+
+    string xmlFilePath = ofSplitString(dir.getPath(videoIdx), ".")[0] + ".xml";
+    if (xmlHandler.loadFile(xmlFilePath)) {
+
+        xmlHandler.pushTag("metadata");
+
+        double getCurrentValue = xmlHandler.getValue(tag, -1.0);
+        if (getCurrentValue != -1.0) {
+            xmlHandler.setValue(tag, value);
+            ofLog(OF_LOG_WARNING, "Replaced tag " + tag + " ...");
+        }
+        else {
+            xmlHandler.addValue(tag, value);
+            ofLog(OF_LOG_NOTICE, "Writing " + ofToString(value) + " to XML, " + dir.getPath(videoIdx));
+        }
+
+        xmlHandler.popTag();
+        xmlHandler.saveFile(xmlFilePath);
+    }
 }
 
 void GuiApp::draw(){
@@ -116,7 +145,10 @@ void GuiApp::draw(){
 void GuiApp::playVideo() {
 	if (currentVideo % 3 + initialVideo < thumbnails.size()) {
 
-        mainPlayer.load(thumbnails[currentVideo % 3 + initialVideo]->name);
+        string currentName = thumbnails[currentVideo % 3 + initialVideo]->name;
+        // current idx?
+
+        mainPlayer.load(currentName);
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
         mainPlayer.play();
 
@@ -126,8 +158,11 @@ void GuiApp::playVideo() {
             double getLumi = xmlHandler.getValue("luminance", -1.0);
             videoLuminance = ofToString(getLumi);
             if (getLumi == -1.0) {
-                luminanceExtractor.setup(dir.getPath(currentVideo));
-                luminanceExtractor.startThread();
+                if (!waitsForLuminance) {
+                    waitsForLuminance = true;
+                    luminanceExtractor.setup(dir.getPath(currentVideo));
+                    luminanceExtractor.startThread();
+                }
             }
         }
 
@@ -175,7 +210,6 @@ void GuiApp::addButtonPressed() {
             thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + (((int)thumbnails.size() - 1) % 3)
 				* (thumbnails[0]->thumbnailSize + 10),
 				thumbnails[0]->thumbnailSize, thumbnails[0]->thumbnailSize);
-
 		}
 	}
 }
@@ -199,7 +233,8 @@ void GuiApp::keyPressed(int key) {
 }
 
 void GuiApp::exit() {
-    luminanceExtractor.stopThread();
+    if (luminanceExtractor.isThreadRunning())
+        luminanceExtractor.stopThread();
 
 	upButton.removeListener(this, &GuiApp::upButtonPressed);
 	downButton.removeListener(this, &GuiApp::downButtonPressed);

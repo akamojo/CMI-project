@@ -8,6 +8,8 @@ class LuminanceExtractor : public ofThread
 public:
     LuminanceExtractor();
     void setup(std::string path);
+    bool isReady();
+    double getLuminance();
 
 private:
 
@@ -28,6 +30,7 @@ private:
     const int frameStep = 50;
 
     double luminance;
+    bool ready;
 
     std::string videoFilePath;
     ofVideoPlayer videoPlayer;

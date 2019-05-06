@@ -35,6 +35,7 @@ public:
 
     ofxXmlSettings xmlHandler;
     LuminanceExtractor luminanceExtractor;
+    bool waitsForLuminance = false;
 
 	int initialVideo = 0;
     int thumbnailsOffset = 10;
@@ -53,6 +54,7 @@ public:
 	void playVideo();
 	void keyPressed(int);
 
-	void exit();
+    void exit();
+    void updateXML(int videoIdx, string tag, double value);
 };
 
