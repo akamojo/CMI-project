@@ -13,6 +13,28 @@ inline bool ends_with(string const & value, string const & ending)
 	return equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
+string splitFilename(const std::string& str)
+{
+	size_t found = str.find_last_of("/\\");
+	return str.substr(found);
+}
+
+void copyFile(string const & SRC, string const & DEST)
+{
+	filesystem::path sourceFile = SRC;
+	filesystem::path targetParent = DEST;
+	auto target = targetParent / sourceFile.filename();
+
+	try
+	{
+		filesystem::copy_file(sourceFile, target, filesystem::copy_option::overwrite_if_exists);
+	}
+	catch (std::exception& e)
+	{
+		cout << e.what();
+	}
+}
+
 void GuiApp::checkMetadatas() {
 
     for (int i = 0; i < (int)dir.size(); i++) {
@@ -211,11 +233,20 @@ void GuiApp::addButtonPressed() {
 			Thumbnail *t = new Thumbnail();
 			thumbnails.push_back(t);
 
-			thumbnails[(int)thumbnails.size() - 1]->setup(path);
+			copyFile(path, dir.getAbsolutePath());
+			cout << "videos/" + splitFilename(path) << endl;
+			thumbnails[(int)thumbnails.size() - 1]->setup("videos/" + splitFilename(path));
 
             thumbnails[(int)thumbnails.size() - 1]->set(thumbnailsOffset, 20 + 100 + (((int)thumbnails.size() - 1) % 3)
 				* (thumbnails[0]->thumbnailSize + 10),
 				thumbnails[0]->thumbnailSize, thumbnails[0]->thumbnailSize);
+
+			dir.allowExt("mov");
+			dir.allowExt("mp4");
+			dir.listDir("videos/");
+
+			checkMetadatas();
+
 		}
 	}
 }
