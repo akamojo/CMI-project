@@ -42,7 +42,7 @@ void GuiApp::checkMetadatas() {
 
 	for (int i = 0; i < (int)dir.size(); i++) {
 
-		vector<string> spl = ofSplitString(dir.getPath(i), ".");
+		vector<string> spl = ofSplitString(thumbnails[i]->name, ".");
 		string xmlFilePath = spl[0] + ".xml";
 		if (xmlHandler.loadFile(xmlFilePath)) {
 			ofLog(OF_LOG_NOTICE, xmlFilePath + " loaded");
@@ -56,7 +56,7 @@ void GuiApp::checkMetadatas() {
 
 			int mainPos = xmlHandler.addTag("metadata");
 			xmlHandler.pushTag("metadata");
-			xmlHandler.addValue("name", ofSplitString(dir.getName(i), ".")[0]);
+			xmlHandler.addValue("name", ofSplitString(thumbnails[i]->name, ".")[0]);
 			xmlHandler.popTag();
 
 			xmlHandler.saveFile(xmlFilePath);
@@ -84,8 +84,6 @@ void GuiApp::setup() {
 	dir.listDir("videos/");
 	dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
 
-	checkMetadatas();
-
 	for (int i = 0; i < (int)dir.size(); i++) {
 		cout << dir.getPath(i) << endl;
 		Thumbnail *t = new Thumbnail();
@@ -95,6 +93,8 @@ void GuiApp::setup() {
 		thumbnails[i]->set(thumbnailsOffset, 20 + 100 + (i % 3) * (thumbnails[0]->thumbnailSize + 10),
 			thumbnails[i]->thumbnailSize, thumbnails[i]->thumbnailSize);
 	}
+
+	checkMetadatas();
 
 	playButton.addListener(this, &GuiApp::playButtonPressed);
 	pauseButton.addListener(this, &GuiApp::pauseButtonPressed);
@@ -131,7 +131,7 @@ void GuiApp::update() {
 
 void GuiApp::updateXML(int videoIdx, string tag, double value) {
 
-	string xmlFilePath = ofSplitString(dir.getPath(videoIdx), ".")[0] + ".xml";
+	string xmlFilePath = ofSplitString(thumbnails[videoIdx]->name, ".")[0] + ".xml";
 	if (xmlHandler.loadFile(xmlFilePath)) {
 
 		xmlHandler.pushTag("metadata");
@@ -143,7 +143,7 @@ void GuiApp::updateXML(int videoIdx, string tag, double value) {
 		}
 		else {
 			xmlHandler.addValue(tag, value);
-			ofLog(OF_LOG_NOTICE, "Writing " + ofToString(value) + " to XML, " + dir.getPath(videoIdx));
+			ofLog(OF_LOG_NOTICE, "Writing " + ofToString(value) + " to XML, " + thumbnails[videoIdx]->name);
 		}
 
 		xmlHandler.popTag();
@@ -179,7 +179,7 @@ void GuiApp::playVideo() {
 		mainPlayer.setLoopState(OF_LOOP_NORMAL);
 		mainPlayer.play();
 
-		if (xmlHandler.loadFile(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml")) {
+		if (xmlHandler.loadFile(ofSplitString(currentName, ".")[0] + ".xml")) {
 
 			xmlHandler.pushTag("metadata");
 			videoName = xmlHandler.getValue("name", "?");
@@ -189,7 +189,7 @@ void GuiApp::playVideo() {
 			if (getLumi == -1.0) {
 				if (!waitsForLuminance) {
 					waitsForLuminance = true;
-					luminanceExtractor.setup(dir.getPath(currentVideo));
+					luminanceExtractor.setup(currentName);
 					luminanceExtractor.startThread();
 				}
 			}
