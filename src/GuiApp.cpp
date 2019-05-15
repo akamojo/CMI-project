@@ -13,6 +13,13 @@ inline bool ends_with(string const & value, string const & ending)
 	return equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
+string splitFilename(const std::string& str)
+{
+	size_t found = str.find_last_of("/\\");
+	return str.substr(found);
+}
+
+
 void GuiApp::checkMetadatas() {
 
     for (int i = 0; i < (int)dir.size(); i++) {
@@ -74,12 +81,14 @@ void GuiApp::setup(){
 	playButton.addListener(this, &GuiApp::playButtonPressed);
 	pauseButton.addListener(this, &GuiApp::pauseButtonPressed);
 	stopButton.addListener(this, &GuiApp::stopButtonPressed);
+	deleteButton.addListener(this, &GuiApp::deleteButtonPressed);
 
 	details.setup();
 	details.add(videoName.setup("file", ""));
 	details.add(playButton.setup("play"));
 	details.add(pauseButton.setup("pause"));
 	details.add(stopButton.setup("stop"));
+	details.add(deleteButton.setup("delete"));
 
     details.add(videoLuminance.setup("lumi", ""));
 
@@ -231,6 +240,21 @@ void GuiApp::pauseButtonPressed() {
 
 void GuiApp::stopButtonPressed() {
 	mainPlayer.stop();
+}
+
+void GuiApp::deleteButtonPressed() {
+	//impossible...
+	//string absolute_path = dir.getAbsolutePath() + splitFilename(dir.getPath(currentVideo));
+	//filesystem::remove(ofSplitString(absolute_path, ".")[0] + ".xml");
+	//filesystem::remove(absolute_path);
+
+	thumbnails.erase(thumbnails.begin() + currentVideo);
+
+	//dir.allowExt("mov");
+	//dir.allowExt("mp4");
+	//dir.listDir("videos/");
+
+	//checkMetadatas();
 }
 
 void GuiApp::keyPressed(int key) {

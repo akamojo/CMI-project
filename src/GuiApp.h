@@ -29,6 +29,7 @@ public:
 	ofxButton playButton;
 	ofxButton pauseButton;
 	ofxButton stopButton;
+	ofxButton deleteButton;
 
 	ofDirectory dir;
 	vector<Thumbnail*> thumbnails;
@@ -49,6 +50,7 @@ public:
 	void playButtonPressed();
 	void pauseButtonPressed();
 	void stopButtonPressed();
+	void deleteButtonPressed();
 	void addButtonPressed();
 
 	void playVideo();
