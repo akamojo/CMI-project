@@ -82,6 +82,9 @@ void GuiApp::setup(){
 	details.add(stopButton.setup("stop"));
 
     details.add(videoLuminance.setup("lumi", ""));
+	details.add(videoR.setup("red", ""));
+	details.add(videoG.setup("green", ""));
+	details.add(videoB.setup("blue", ""));
 
 	playVideo();
 
@@ -98,9 +101,20 @@ void GuiApp::update(){
     if (waitsForLuminance && luminanceExtractor.isReady()) {
         waitsForLuminance = false;
         double readLuminance = luminanceExtractor.getLuminance();
+		vector<double> avgColors = luminanceExtractor.getAvgColors();
         luminanceExtractor.stopThread();
+
         videoLuminance = ofToString(readLuminance);
+		videoR = ofToString(avgColors[0]);
+		videoG = ofToString(avgColors[1]);
+		videoB = ofToString(avgColors[2]);
+
         updateXML(currentVideo, "luminance", readLuminance);
+
+		updateXML(currentVideo, "red", avgColors[0]);
+		updateXML(currentVideo, "green", avgColors[1]);
+		updateXML(currentVideo, "blue", avgColors[2]);
+
     }
 }
 
@@ -160,6 +174,15 @@ void GuiApp::playVideo() {
             videoName = xmlHandler.getValue("name", "?");
             double getLumi = xmlHandler.getValue("luminance", -1.0);
             videoLuminance = ofToString(getLumi);
+
+			double getR = xmlHandler.getValue("red", -1.0);
+			double getG = xmlHandler.getValue("green", -1.0);
+			double getB = xmlHandler.getValue("blue", -1.0);
+
+			videoR = ofToString(getR);
+			videoG = ofToString(getG);
+			videoB = ofToString(getB);
+
             
 			if (getLumi == -1.0) {
                 if (!waitsForLuminance) {

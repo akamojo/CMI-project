@@ -25,6 +25,9 @@ public:
 
     ofxLabel videoName;
     ofxLabel videoLuminance;
+	ofxLabel videoR;
+	ofxLabel videoG;
+	ofxLabel videoB;
 
 	ofxButton playButton;
 	ofxButton pauseButton;

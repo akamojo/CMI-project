@@ -11,15 +11,16 @@ public:
     void setup(std::string path);
     bool isReady();
     double getLuminance();
+	vector<double> getAvgColors();
 
 private:
 
     void threadedFunction();
 
-    double calculateFrame();
+    vector<double> calculateFrame();
 
     void convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight);
-    double calculatePixel(ofPixels, int i, int j, int vidWidth, int nChannels);
+    vector <double> calculatePixel(ofPixels, int i, int j, int vidWidth, int nChannels);
 
     const double rc = 0.2126;
     const double gc = 0.7152;
@@ -31,6 +32,7 @@ private:
     const int frameStep = 100;
 
     double luminance;
+	vector<double> avgColors;
     bool ready;
 
     std::string videoFilePath;
