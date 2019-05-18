@@ -22,6 +22,8 @@ void GuiApp::checkMetadatas() {
         if (xmlHandler.loadFile(xmlFilePath)) {
             ofLog(OF_LOG_NOTICE, xmlFilePath + " loaded");
             double lumi = xmlHandler.getValue("luminance", -1.0);
+			double rythm = xmlHandler.getValue("rythm", -1.0);
+
             if (lumi == -1.0) {
                 // ? do something ? or not?
             }
@@ -82,6 +84,7 @@ void GuiApp::setup(){
 	details.add(stopButton.setup("stop"));
 
     details.add(videoLuminance.setup("lumi", ""));
+	details.add(videoRythm.setup("rythm", ""));
 
 	playVideo();
 
@@ -102,6 +105,14 @@ void GuiApp::update(){
         videoLuminance = ofToString(readLuminance);
         updateXML(currentVideo, "luminance", readLuminance);
     }
+
+	if (waitsForRythm && rythmExtractor.isReady()) {
+		waitsForRythm = false;
+		double readRythm = rythmExtractor.getRythm();
+		rythmExtractor.stopThread();
+		videoRythm = ofToString(readRythm);
+		updateXML(currentVideo, "rythm", readRythm);
+	}
 }
 
 void GuiApp::updateXML(int videoIdx, string tag, double value) {
@@ -160,6 +171,8 @@ void GuiApp::playVideo() {
             videoName = xmlHandler.getValue("name", "?");
             double getLumi = xmlHandler.getValue("luminance", -1.0);
             videoLuminance = ofToString(getLumi);
+			double getRythm = xmlHandler.getValue("rythm", -1.0);
+			videoRythm = ofToString(getRythm);
             
 			if (getLumi == -1.0) {
                 if (!waitsForLuminance) {
@@ -168,6 +181,14 @@ void GuiApp::playVideo() {
                     luminanceExtractor.startThread();
                 }
             }
+
+			if (getRythm == -1.0) {
+				if (!waitsForRythm) {
+					waitsForRythm = true;
+					rythmExtractor.setup(dir.getPath(currentVideo));
+					rythmExtractor.startThread();
+				}
+			}
         }
 
         details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50,

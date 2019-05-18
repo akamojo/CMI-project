@@ -3,6 +3,7 @@
 #include "ofxGui.h"
 #include "Thumbnail.h"
 #include "luminanceextractor.h"
+#include "rythmextractor.h"
 
 #include <ofxXmlSettings.h>
 
@@ -25,6 +26,7 @@ public:
 
     ofxLabel videoName;
     ofxLabel videoLuminance;
+	ofxLabel videoRythm;
 
 	ofxButton playButton;
 	ofxButton pauseButton;
@@ -35,7 +37,10 @@ public:
 
     ofxXmlSettings xmlHandler;
     LuminanceExtractor luminanceExtractor;
+	RythmExtractor rythmExtractor;
+
     bool waitsForLuminance = false;
+	bool waitsForRythm = false;
 
     int thumbnailIdxOffset = 0;
     int thumbnailsOffset = 10;
