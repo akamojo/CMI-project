@@ -2,7 +2,9 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "Thumbnail.h"
+
 #include "luminanceextractor.h"
+#include "webcampreview.h"
 
 #include <ofxXmlSettings.h>
 
@@ -19,9 +21,14 @@ public:
 	ofxButton upButton;
 	ofxButton downButton;
 	ofxButton addButton;
+    ofxButton goBackButton;
 
 	ofxPanel nav;
 	ofxPanel details;
+
+    ofxPanel startScreenNav;
+    ofxButton startButton;
+    ofxButton manageButton;
 
     ofxLabel videoName;
     ofxLabel videoLuminance;
@@ -41,20 +48,34 @@ public:
     int thumbnailsOffset = 10;
 	int currentVideo = 0;
 
+    WebCamPreview webCamPreview;
+    bool startScreenMode = false;
+
+    ofVideoGrabber vidGrabber;
+    int camWidth = 320;
+    int camHeight = 240;
+    int camPreviewOffset = 50;
+
     void checkMetadatas();
 
 	void upButtonPressed();
 	void downButtonPressed();
+    void addButtonPressed();
+    void goBackButtonPressed();
 
 	void playButtonPressed();
 	void pauseButtonPressed();
 	void stopButtonPressed();
-	void addButtonPressed();
+
+    void startButtonPressed();
+    void manageButtonPressed();
 
 	void playVideo();
 	void keyPressed(int);
 
     void exit();
     void updateXML(int videoIdx, string tag, double value);
+private:
+    void setupVidGrabber();
 };
 

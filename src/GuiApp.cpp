@@ -40,17 +40,43 @@ void GuiApp::checkMetadatas() {
     }
 }
 
+void GuiApp::setupVidGrabber() {
+    vidGrabber.setDeviceID(0);
+    vidGrabber.setDesiredFrameRate(60);
+    vidGrabber.initGrabber(camWidth, camHeight);
+}
+
 void GuiApp::setup(){
 	ofSetVerticalSync(true);
 
+    // START SCREEN
+
+    vector<ofVideoDevice> devices = vidGrabber.listDevices();
+
+    for (size_t i = 0; i < devices.size(); i++) {
+        if (devices[i].bAvailable) {
+            ofLogNotice() << devices[i].id << ": " << devices[i].deviceName;
+        }
+        else {
+            ofLogNotice() << devices[i].id << ": " << devices[i].deviceName << " - unavailable ";
+        }
+    }
+
+    setupVidGrabber();
+    ofBackground(0);
+
+    // VIDEO LIBRARY SCREEN
+
 	upButton.addListener(this, &GuiApp::upButtonPressed);
 	downButton.addListener(this, &GuiApp::downButtonPressed);
-	addButton.addListener(this, &GuiApp::addButtonPressed);
+    addButton.addListener(this, &GuiApp::addButtonPressed);
+    goBackButton.addListener(this, &GuiApp::goBackButtonPressed);
 
 	nav.setup();
 	nav.add(upButton.setup("up"));
 	nav.add(downButton.setup("down"));
-    nav.add(addButton.setup("add new"));
+    nav.add(addButton.setup("add new video"));
+    nav.add(goBackButton.setup("BACK"));
 
     ofBackground(255, 0, 144);
 
@@ -83,24 +109,37 @@ void GuiApp::setup(){
 
     details.add(videoLuminance.setup("lumi", ""));
 
-	playVideo();
+    startButton.addListener(this, &GuiApp::startButtonPressed);
+    manageButton.addListener(this, &GuiApp::manageButtonPressed);
 
+    startScreenNav.setup();
+    startScreenNav.setPosition(camPreviewOffset, camPreviewOffset + camHeight + 30);
+    startScreenNav.add(startButton.setup("START"));
+    startScreenNav.add(manageButton.setup("MANAGE"));
+
+    playVideo();
 	ofSetVerticalSync(false);
 }
 
 void GuiApp::update(){
-	for (int i = 0; i < (int)thumbnails.size(); i++) {
-		thumbnails[i]->video.update();
-		thumbnails[i]->update();
-	}
-	mainPlayer.update();
 
-    if (waitsForLuminance && luminanceExtractor.isReady()) {
-        waitsForLuminance = false;
-        double readLuminance = luminanceExtractor.getLuminance();
-        luminanceExtractor.stopThread();
-        videoLuminance = ofToString(readLuminance);
-        updateXML(currentVideo, "luminance", readLuminance);
+    if (startScreenMode) {
+        vidGrabber.update();
+    }
+    else {
+        for (int i = 0; i < (int)thumbnails.size(); i++) {
+            thumbnails[i]->video.update();
+            thumbnails[i]->update();
+        }
+        mainPlayer.update();
+
+        if (waitsForLuminance && luminanceExtractor.isReady()) {
+            waitsForLuminance = false;
+            double readLuminance = luminanceExtractor.getLuminance();
+            luminanceExtractor.stopThread();
+            videoLuminance = ofToString(readLuminance);
+            updateXML(currentVideo, "luminance", readLuminance);
+        }
     }
 }
 
@@ -127,22 +166,33 @@ void GuiApp::updateXML(int videoIdx, string tag, double value) {
 }
 
 void GuiApp::draw(){
-	nav.draw();
-	details.draw();
 
-	if (dir.size() > 0) {
-		ofSetColor(ofColor::white);
+    if (startScreenMode) {
+        vidGrabber.draw(camPreviewOffset, camPreviewOffset);
+        startScreenNav.draw();
 
-        for (int i = thumbnailIdxOffset; i < thumbnailIdxOffset + 3; i++) {
-			if (i < (int)thumbnails.size() && i >= 0) {
-				thumbnails[i]->enabled = true;
-				thumbnails[i]->draw(thumbnailsOffset, 
-                    20 + 100 + (i - thumbnailIdxOffset) * (thumbnails[0]->thumbnailSize + 10));
-			}
-		}
+        ofSetHexColor(0xffffff);
+        ofNoFill();
+    }
+    else {
+        nav.draw();
+        details.draw();
 
-        mainPlayer.draw(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50, 20, mainPlayerWidth, mainPlayerHeight);
-	}
+        if (dir.size() > 0) {
+            ofSetColor(ofColor::white);
+
+            for (int i = thumbnailIdxOffset; i < thumbnailIdxOffset + 3; i++) {
+                if (i < (int)thumbnails.size() && i >= 0) {
+                    thumbnails[i]->enabled = true;
+                    thumbnails[i]->draw(thumbnailsOffset,
+                        20 + 100 + (i - thumbnailIdxOffset) * (thumbnails[0]->thumbnailSize + 10));
+                }
+            }
+
+            mainPlayer.draw(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50, 20, mainPlayerWidth, mainPlayerHeight);
+        }
+    }
+
 }
 
 void GuiApp::playVideo() {
@@ -217,7 +267,13 @@ void GuiApp::addButtonPressed() {
 				* (thumbnails[0]->thumbnailSize + 10),
 				thumbnails[0]->thumbnailSize, thumbnails[0]->thumbnailSize);
 		}
-	}
+    }
+}
+
+void GuiApp::goBackButtonPressed()
+{
+    if (!startScreenMode)
+        startScreenMode = true;
 }
 
 void GuiApp::playButtonPressed() {
@@ -230,7 +286,18 @@ void GuiApp::pauseButtonPressed() {
 }
 
 void GuiApp::stopButtonPressed() {
-	mainPlayer.stop();
+    mainPlayer.stop();
+}
+
+void GuiApp::startButtonPressed()
+{
+
+}
+
+void GuiApp::manageButtonPressed()
+{
+    if (startScreenMode)
+        startScreenMode = false;
 }
 
 void GuiApp::keyPressed(int key) {

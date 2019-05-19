@@ -22,8 +22,11 @@ double LuminanceExtractor::getLuminance()
 }
 
 void LuminanceExtractor::threadedFunction() {
+
     videoPlayer.load(videoFilePath);
     videoPlayer.setLoopState(OF_LOOP_NONE);
+//    videoPlayer.setVolume(0.0);
+
     videoPlayer.play();
     ofLog(OF_LOG_NOTICE, "LumExtractor starts for " + videoFilePath + "...");
 
