@@ -6,6 +6,7 @@
 #include "luminanceextractor.h"
 #include "webcampreview.h"
 
+#include <ofxCvHaarFinder.h>
 #include <ofxXmlSettings.h>
 
 class GuiApp: public ofBaseApp {
@@ -50,6 +51,8 @@ public:
 
     WebCamPreview webCamPreview;
     bool startScreenMode = false;
+    ofxCvHaarFinder webCamPreviewFaceFinder;
+    ofImage colorImg;
 
     ofVideoGrabber vidGrabber;
     int camWidth = 320;

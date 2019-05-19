@@ -62,6 +62,7 @@ void GuiApp::setup(){
         }
     }
 
+    webCamPreviewFaceFinder.setup("haarcascade_frontalface_default.xml");
     setupVidGrabber();
     ofBackground(0);
 
@@ -125,6 +126,12 @@ void GuiApp::update(){
 
     if (startScreenMode) {
         vidGrabber.update();
+
+        if (vidGrabber.isFrameNew())
+        {
+            colorImg.setFromPixels(vidGrabber.getPixels());
+            webCamPreviewFaceFinder.findHaarObjects(colorImg);
+        }
     }
     else {
         for (int i = 0; i < (int)thumbnails.size(); i++) {
@@ -170,6 +177,12 @@ void GuiApp::draw(){
     if (startScreenMode) {
         vidGrabber.draw(camPreviewOffset, camPreviewOffset);
         startScreenNav.draw();
+
+        for (unsigned int i = 0; i < webCamPreviewFaceFinder.blobs.size(); i++)
+        {
+            ofRectangle cur = webCamPreviewFaceFinder.blobs[i].boundingRect;
+            ofRect(cur.x + camPreviewOffset, cur.y + camPreviewOffset, cur.width, cur.height);
+        }
 
         ofSetHexColor(0xffffff);
         ofNoFill();
