@@ -13,29 +13,30 @@ inline bool ends_with(string const & value, string const & ending)
 	return equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
-void GuiApp::checkMetadatas() {
+void GuiApp::createMetadatasFiles() {
 
     for (int i = 0; i < (int)dir.size(); i++) {
 
         vector<string> spl = ofSplitString(dir.getPath(i), ".");
         string xmlFilePath = spl[0] + ".xml";
         if (xmlHandler.loadFile(xmlFilePath)) {
-            ofLog(OF_LOG_NOTICE, xmlFilePath + " loaded");
-            double lumi = xmlHandler.getValue("luminance", -1.0);
-            if (lumi == -1.0) {
-                // ? do something ? or not?
-            }
+            ofLog(OF_LOG_NOTICE, xmlFilePath + " metadata file loaded");
         }
         else {
             ofLog(OF_LOG_NOTICE, xmlFilePath + " does not exist");
 
             int mainPos = xmlHandler.addTag("metadata");
             xmlHandler.pushTag("metadata");
+
             xmlHandler.addValue("name", ofSplitString(dir.getName(i), ".")[0]);
+            xmlHandler.addValue("luminance", -1.0);
+
             xmlHandler.popTag();
 
             xmlHandler.saveFile(xmlFilePath);
             xmlHandler.clear();
+
+            ofLog(OF_LOG_NOTICE, xmlFilePath + " metadata file created");
         }
     }
 }
@@ -46,11 +47,7 @@ void GuiApp::setupVidGrabber() {
     vidGrabber.initGrabber(camWidth, camHeight);
 }
 
-void GuiApp::setup(){
-	ofSetVerticalSync(true);
-
-    // START SCREEN
-
+void GuiApp::checkVidGrabberDevices() {
     vector<ofVideoDevice> devices = vidGrabber.listDevices();
 
     for (size_t i = 0; i < devices.size(); i++) {
@@ -61,7 +58,15 @@ void GuiApp::setup(){
             ofLogNotice() << devices[i].id << ": " << devices[i].deviceName << " - unavailable ";
         }
     }
+}
 
+
+void GuiApp::setup(){
+	ofSetVerticalSync(true);
+
+    // START SCREEN
+
+    checkVidGrabberDevices();
     webCamPreviewFaceFinder.setup("haarcascade_frontalface_default.xml");
     setupVidGrabber();
     ofBackground(0);
@@ -86,7 +91,9 @@ void GuiApp::setup(){
     dir.listDir("videos/");
 	dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
 
-    checkMetadatas();
+    createMetadatasFiles();
+    worker.setup(dir);
+    worker.startThread();
 
 	for (int i = 0; i < (int)dir.size(); i++) {
 		cout << dir.getPath(i) << endl;
@@ -139,36 +146,6 @@ void GuiApp::update(){
             thumbnails[i]->update();
         }
         mainPlayer.update();
-
-        if (waitsForLuminance && luminanceExtractor.isReady()) {
-            waitsForLuminance = false;
-            double readLuminance = luminanceExtractor.getLuminance();
-            luminanceExtractor.stopThread();
-            videoLuminance = ofToString(readLuminance);
-            updateXML(currentVideo, "luminance", readLuminance);
-        }
-    }
-}
-
-void GuiApp::updateXML(int videoIdx, string tag, double value) {
-
-    string xmlFilePath = ofSplitString(dir.getPath(videoIdx), ".")[0] + ".xml";
-    if (xmlHandler.loadFile(xmlFilePath)) {
-
-        xmlHandler.pushTag("metadata");
-
-        double getCurrentValue = xmlHandler.getValue(tag, -1.0);
-        if (getCurrentValue != -1.0) {
-            xmlHandler.setValue(tag, value);
-            ofLog(OF_LOG_WARNING, "Replaced tag " + tag + " ...");
-        }
-        else {
-            xmlHandler.addValue(tag, value);
-            ofLog(OF_LOG_NOTICE, "Writing " + ofToString(value) + " to XML, " + dir.getPath(videoIdx));
-        }
-
-        xmlHandler.popTag();
-        xmlHandler.saveFile(xmlFilePath);
     }
 }
 
@@ -222,16 +199,10 @@ void GuiApp::playVideo() {
 			
 			xmlHandler.pushTag("metadata");
             videoName = xmlHandler.getValue("name", "?");
+
             double getLumi = xmlHandler.getValue("luminance", -1.0);
             videoLuminance = ofToString(getLumi);
-            
-			if (getLumi == -1.0) {
-                if (!waitsForLuminance) {
-                    waitsForLuminance = true;
-                    luminanceExtractor.setup(dir.getPath(currentVideo));
-                    luminanceExtractor.startThread();
-                }
-            }
+
         }
 
         details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50,
@@ -329,8 +300,8 @@ void GuiApp::keyPressed(int key) {
 }
 
 void GuiApp::exit() {
-    if (luminanceExtractor.isThreadRunning())
-        luminanceExtractor.stopThread();
+    if (worker.isThreadRunning())
+        worker.stopThread();
 
 	upButton.removeListener(this, &GuiApp::upButtonPressed);
 	downButton.removeListener(this, &GuiApp::downButtonPressed);

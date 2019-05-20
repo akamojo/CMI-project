@@ -4,6 +4,7 @@
 #include "Thumbnail.h"
 
 #include "luminanceextractor.h"
+#include "videobackgroundworker.h"
 #include "webcampreview.h"
 
 #include <ofxCvHaarFinder.h>
@@ -42,8 +43,8 @@ public:
 	vector<Thumbnail*> thumbnails;
 
     ofxXmlSettings xmlHandler;
-    LuminanceExtractor luminanceExtractor;
-    bool waitsForLuminance = false;
+
+    VideoBackgroundWorker worker;
 
     int thumbnailIdxOffset = 0;
     int thumbnailsOffset = 10;

@@ -8,27 +8,20 @@ void LuminanceExtractor::setup(std::string path)
     this->videoFilePath = path;
     this->frameCounter = 0;
     this->luminance = -1.0;
-    this->ready = false;
-}
-
-bool LuminanceExtractor::isReady()
-{
-    return this->ready;
 }
 
 double LuminanceExtractor::getLuminance()
 {
-    return isReady() ? this->luminance : 1.0;
+    return this->luminance;
 }
 
-void LuminanceExtractor::threadedFunction() {
+void LuminanceExtractor::calculate() {
 
     videoPlayer.load(videoFilePath);
     videoPlayer.setLoopState(OF_LOOP_NONE);
-//    videoPlayer.setVolume(0.0);
 
     videoPlayer.play();
-    ofLog(OF_LOG_NOTICE, "LumExtractor starts for " + videoFilePath + "...");
+    ofLog(OF_LOG_NOTICE, "[LumExtractor] starts for " + videoFilePath + "...");
 
     double currentLumi;
     while (true) {
@@ -48,8 +41,7 @@ void LuminanceExtractor::threadedFunction() {
     }
 
     luminance = luminance / (double)(frameCounter / frameStep);
-    ofLog(OF_LOG_NOTICE, "[thread] LUMI = " + ofToString(luminance));
-    ready = true;
+    ofLog(OF_LOG_NOTICE, "[LumExtractor] LUMI = " + ofToString(luminance));
 }
 
 double LuminanceExtractor::calculatePixel(ofPixels pixels, int i, int j, int vidWidth, int nChannels) {

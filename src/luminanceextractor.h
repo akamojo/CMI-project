@@ -4,17 +4,15 @@
 #include <ofVideoPlayer.h>
 #include "ofMain.h"
 
-class LuminanceExtractor : public ofThread
+class LuminanceExtractor
 {
 public:
     LuminanceExtractor();
     void setup(std::string path);
-    bool isReady();
     double getLuminance();
+    void calculate();
 
 private:
-
-    void threadedFunction();
 
     double calculateFrame();
 
@@ -31,7 +29,6 @@ private:
     const int frameStep = 100;
 
     double luminance;
-    bool ready;
 
     std::string videoFilePath;
     ofVideoPlayer videoPlayer;
