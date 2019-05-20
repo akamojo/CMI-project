@@ -13,3 +13,5 @@ config.make
 CMIproject.qbs.user 
 CMIproject.user 
 dirListExample.qbs.user
+*.autosave
+
