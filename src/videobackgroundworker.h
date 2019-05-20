@@ -1,7 +1,7 @@
 #ifndef VIDEOBACKGROUNDWORKER_H
 #define VIDEOBACKGROUNDWORKER_H
 
-#include "luminanceextractor.h"
+#include "featureextractor.h"
 #include "ofMain.h"
 #include <ofFileUtils.h>
 #include <ofThread.h>
@@ -21,7 +21,7 @@ protected:
 private:
     ofDirectory videosDir;
     ofxXmlSettings xmlHandler;
-    LuminanceExtractor extractor;
+    FeatureExtractor extractor;
     bool workFinished = false;
 
     void updateXML(string path, string tag, double value, double missingValue);

@@ -14,4 +14,5 @@ CMIproject.qbs.user
 CMIproject.user 
 dirListExample.qbs.user
 *.autosave
+.vscode*
 

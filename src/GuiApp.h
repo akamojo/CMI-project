@@ -3,7 +3,7 @@
 #include "ofxGui.h"
 #include "Thumbnail.h"
 
-#include "luminanceextractor.h"
+#include "featureextractor.h"
 #include "videobackgroundworker.h"
 #include "webcampreview.h"
 
@@ -34,6 +34,9 @@ public:
 
     ofxLabel videoName;
     ofxLabel videoLuminance;
+	ofxLabel videoR;
+	ofxLabel videoG;
+	ofxLabel videoB;
 
 	ofxButton playButton;
 	ofxButton pauseButton;

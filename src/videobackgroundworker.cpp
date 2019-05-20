@@ -38,6 +38,8 @@ void VideoBackgroundWorker::updateXML(string path, string tag, double value, dou
 
         xmlHandler.popTag();
         xmlHandler.saveFile(xmlFilePath);
+
+        xmlHandler.clear();
     }
 }
 
@@ -49,22 +51,30 @@ void VideoBackgroundWorker::threadedFunction()
         vector<string> spl = ofSplitString(videoName, ".");
         string xmlFilePath = spl[0] + ".xml";
 
+        xmlHandler.clear();
         ofLog(OF_LOG_NOTICE, "[BG Worker] Checking video " + videoName);
         if (xmlHandler.loadFile(xmlFilePath)) {
 
             xmlHandler.pushTag("metadata");
             double getLumi = xmlHandler.getValue("luminance", -1.0);
+            double getRed = xmlHandler.getValue("red", -1.0);
 
-            if (getLumi == -1.0) {
+            if (getLumi == -1.0 || getRed == -1.0) {
 
-                ofLog(OF_LOG_NOTICE, "[BG Worker] Calculating Luminance ");
+                ofLog(OF_LOG_NOTICE, "[BG Worker] Calculating features ");
 
                 extractor.setup(videoName);
                 extractor.calculate();
+
                 getLumi = extractor.getLuminance();
                 updateXML(videoName, "luminance", getLumi, -1.0);
-
                 ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with " + ofToString(getLumi));
+
+                vector<double> avgColors = extractor.getAvgColors();
+                updateXML(videoName, "red", avgColors[0], -1.0);
+                updateXML(videoName, "green", avgColors[1], -1.0);
+                updateXML(videoName, "blue", avgColors[2], -1.0);
+                ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with " + ofToString(avgColors[0]) + "," + ofToString(avgColors[1]) + "," + ofToString(avgColors[2]));
 
             }
 

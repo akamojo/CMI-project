@@ -17,6 +17,8 @@ void GuiApp::createMetadatasFiles() {
 
     for (int i = 0; i < (int)dir.size(); i++) {
 
+        xmlHandler.clear();
+
         vector<string> spl = ofSplitString(dir.getPath(i), ".");
         string xmlFilePath = spl[0] + ".xml";
         if (xmlHandler.loadFile(xmlFilePath)) {
@@ -30,15 +32,17 @@ void GuiApp::createMetadatasFiles() {
 
             xmlHandler.addValue("name", ofSplitString(dir.getName(i), ".")[0]);
             xmlHandler.addValue("luminance", -1.0);
+            xmlHandler.addValue("red", -1.0);
+            xmlHandler.addValue("green", -1.0);
+            xmlHandler.addValue("blue", -1.0);
 
             xmlHandler.popTag();
-
             xmlHandler.saveFile(xmlFilePath);
-            xmlHandler.clear();
 
             ofLog(OF_LOG_NOTICE, xmlFilePath + " metadata file created");
         }
     }
+    xmlHandler.clear();
 }
 
 void GuiApp::setupVidGrabber() {
@@ -116,6 +120,9 @@ void GuiApp::setup(){
 	details.add(stopButton.setup("stop"));
 
     details.add(videoLuminance.setup("lumi", ""));
+	details.add(videoR.setup("red", ""));
+	details.add(videoG.setup("green", ""));
+	details.add(videoB.setup("blue", ""));
 
     startButton.addListener(this, &GuiApp::startButtonPressed);
     manageButton.addListener(this, &GuiApp::manageButtonPressed);
@@ -145,8 +152,9 @@ void GuiApp::update(){
             thumbnails[i]->video.update();
             thumbnails[i]->update();
         }
-        mainPlayer.update();
+        mainPlayer.update();    
     }
+
 }
 
 void GuiApp::draw(){
@@ -189,7 +197,6 @@ void GuiApp::playVideo() {
 
     if (currentVideo < thumbnails.size() && currentVideo >= 0) {
         string currentName = thumbnails[currentVideo]->name;
-        ofLog(OF_LOG_NOTICE, currentName);
 
         mainPlayer.load(currentName);
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
@@ -202,6 +209,14 @@ void GuiApp::playVideo() {
 
             double getLumi = xmlHandler.getValue("luminance", -1.0);
             videoLuminance = ofToString(getLumi);
+
+			double getR = xmlHandler.getValue("red", -1.0);
+			double getG = xmlHandler.getValue("green", -1.0);
+			double getB = xmlHandler.getValue("blue", -1.0);
+
+			videoR = ofToString(getR);
+			videoG = ofToString(getG);
+			videoB = ofToString(getB);
 
         }
 
