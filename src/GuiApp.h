@@ -59,7 +59,7 @@ public:
     int camHeight = 240;
     int camPreviewOffset = 50;
 
-    void checkMetadatas();
+    void createMetadatasFiles();
 
 	void upButtonPressed();
 	void downButtonPressed();
@@ -80,5 +80,6 @@ public:
     void updateXML(int videoIdx, string tag, double value);
 private:
     void setupVidGrabber();
+    void checkVidGrabberDevices();
 };
 

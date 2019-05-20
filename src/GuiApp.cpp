@@ -212,6 +212,7 @@ void GuiApp::playVideo() {
 
     if (currentVideo < thumbnails.size() && currentVideo >= 0) {
         string currentName = thumbnails[currentVideo]->name;
+        ofLog(OF_LOG_NOTICE, currentName);
 
         mainPlayer.load(currentName);
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
