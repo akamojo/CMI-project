@@ -58,8 +58,9 @@ void VideoBackgroundWorker::threadedFunction()
             xmlHandler.pushTag("metadata");
             double getLumi = xmlHandler.getValue("luminance", -1.0);
             double getRed = xmlHandler.getValue("red", -1.0);
+			double getRythm = xmlHandler.getValue("rythm", -1.0);
 
-            if (getLumi == -1.0 || getRed == -1.0) {
+            if (getLumi == -1.0 || getRed == -1.0 || getRythm == -1.0) {
 
                 ofLog(OF_LOG_NOTICE, "[BG Worker] Calculating features ");
 
@@ -76,6 +77,9 @@ void VideoBackgroundWorker::threadedFunction()
                 updateXML(videoName, "blue", avgColors[2], -1.0);
                 ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with " + ofToString(avgColors[0]) + "," + ofToString(avgColors[1]) + "," + ofToString(avgColors[2]));
 
+				getRythm = extractor.getRythm();
+				updateXML(videoName, "rythm", getRythm, -1.0);
+				ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with " + ofToString(getRythm));
             }
 
         }

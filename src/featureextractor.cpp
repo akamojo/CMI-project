@@ -8,6 +8,8 @@ void FeatureExtractor::setup(std::string path)
     this->videoFilePath = path;
     this->frameCounter = 0;
     this->luminance = -1.0;
+	this->prevHist = NULL;
+	this->rythm = -1.0;
 
 	this->avgColors.clear();
 	for (int i = 0; i < 3; i++) {
@@ -16,6 +18,22 @@ void FeatureExtractor::setup(std::string path)
 
     ofFile fileToRead(path);
     fileToRead.copyTo(tempFilename, true, true);
+}
+
+
+double FeatureExtractor::getLuminance()
+{
+    return this->luminance;
+}
+
+vector<double> FeatureExtractor::getAvgColors()
+{
+	return avgColors;
+}
+
+double FeatureExtractor::getRythm()
+{
+	return rythm;
 }
 
 void FeatureExtractor::calculate() {
@@ -43,6 +61,7 @@ void FeatureExtractor::calculate() {
             if (frameCounter % frameStep == 0) {
                 currentColors = this->calculateFrame();
                 luminance += currentColors[3];
+				rythm += this->calculateDiffBetweenFrames();
                 ofLog(OF_LOG_WARNING, ofToString(currentColors[3]));
 
 				for (int i = 0; i < 3; i++) {
@@ -52,6 +71,9 @@ void FeatureExtractor::calculate() {
             }
         }
     }
+
+	rythm = rythm / (double)(frameCounter / frameStep);
+	ofLog(OF_LOG_NOTICE, "[RythmExtractor] RYTHM = " + ofToString(rythm));
 
     luminance = luminance / (double)(frameCounter / frameStep);
     ofLog(OF_LOG_NOTICE, "[LumExtractor] LUMI = " + ofToString(luminance));
@@ -101,6 +123,41 @@ vector<double> FeatureExtractor::calculateFrame() {
     int n = sizeof(result) / sizeof(result[0]);
     vector<double> vresult(result, result+n);
     return vresult;
+}
+
+double FeatureExtractor::calculateDiffBetweenFrames() {
+
+	ofxCvColorImage colorImg;
+	ofxCvGrayscaleImage grayImg;
+
+	colorImg.setFromPixels(videoPlayer.getPixels());
+	grayImg = colorImg;
+
+	IplImage* grayCVImg = grayImg.getCvImage();
+	int g_bins = 32;
+	CvHistogram* hist;
+	{
+		int hist_size[] = { g_bins };
+		float g_ranges[] = { 0, 255 };
+		float* ranges[] = { g_ranges };
+		hist = cvCreateHist(
+			1,
+			hist_size,
+			CV_HIST_ARRAY,
+			ranges,
+			1
+		);
+	}
+	cvCalcHist(&grayCVImg, hist);
+
+	double diff = 0;
+
+	if (prevHist != NULL)
+		diff = cvCompareHist(hist, prevHist, CV_COMP_INTERSECT);
+
+	prevHist = hist;
+
+	return diff;
 }
 
 void FeatureExtractor::convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight) {
