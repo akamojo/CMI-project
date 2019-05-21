@@ -1,9 +1,9 @@
-#include "luminanceextractor.h"
+#include "featureextractor.h"
 
-LuminanceExtractor::LuminanceExtractor() {
+FeatureExtractor::FeatureExtractor() {
 }
 
-void LuminanceExtractor::setup(std::string path)
+void FeatureExtractor::setup(std::string path)
 {
     this->videoFilePath = path;
     this->frameCounter = 0;
@@ -18,17 +18,7 @@ void LuminanceExtractor::setup(std::string path)
     fileToRead.copyTo(tempFilename, true, true);
 }
 
-
-double LuminanceExtractor::getLuminance()
-{
-    return this->luminance;
-}
-
-vector<double> LuminanceExtractor::getAvgColors()
-{
-	return avgColors;
-}
-void LuminanceExtractor::calculate() {
+void FeatureExtractor::calculate() {
 
     if (videoFilePath == "?") return;
 
@@ -73,7 +63,7 @@ void LuminanceExtractor::calculate() {
     videoPlayer.close();    
 }
 
-vector<double> LuminanceExtractor::calculatePixel(ofPixels pixels, int i, int j, int vidWidth, int nChannels) {
+vector<double> FeatureExtractor::calculatePixel(ofPixels pixels, int i, int j, int vidWidth, int nChannels) {
 	vector<double> colors;
 
 	for (int k = 0; k < 3; k++) {
@@ -83,7 +73,7 @@ vector<double> LuminanceExtractor::calculatePixel(ofPixels pixels, int i, int j,
 	return colors;
 }
 
-vector<double> LuminanceExtractor::calculateFrame() {
+vector<double> FeatureExtractor::calculateFrame() {
     double result[4] = {0.0};
 
     ofPixels & pixels = videoPlayer.getPixels();
@@ -113,7 +103,7 @@ vector<double> LuminanceExtractor::calculateFrame() {
     return vresult;
 }
 
-void LuminanceExtractor::convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight) {
+void FeatureExtractor::convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight) {
 
     double currentLumi;
     for (int i = 0; i < vidWidth; ++i) {
