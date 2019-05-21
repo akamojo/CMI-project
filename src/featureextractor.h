@@ -3,6 +3,8 @@
 
 #include <ofVideoPlayer.h>
 #include "ofMain.h"
+#include "ofxCvColorImage.h"
+#include "ofxCvGrayscaleImage.h"
 
 #include <iostream>
 #include <vector>
@@ -14,11 +16,13 @@ public:
     void setup(std::string path);
     double getLuminance();
 	vector<double> getAvgColors();
+	double getRythm();
 
     void calculate();
 
 private:
     vector<double> calculateFrame();
+	double calculateDiffBetweenFrames();
 
     void convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight);
     vector <double> calculatePixel(ofPixels, int i, int j, int vidWidth, int nChannels);
@@ -32,6 +36,9 @@ private:
     int frameCounter;
     const int frameStep = 100;
 
+	CvHistogram* prevHist = NULL;
+
+	double rythm;
     double luminance;
 	vector<double> avgColors;
 

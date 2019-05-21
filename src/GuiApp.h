@@ -37,6 +37,7 @@ public:
 	ofxLabel videoR;
 	ofxLabel videoG;
 	ofxLabel videoB;
+	ofxLabel videoRythm;
 
 	ofxButton playButton;
 	ofxButton pauseButton;

@@ -35,6 +35,7 @@ void GuiApp::createMetadatasFiles() {
             xmlHandler.addValue("red", -1.0);
             xmlHandler.addValue("green", -1.0);
             xmlHandler.addValue("blue", -1.0);
+			xmlHandler.addValue("rythm", -1.0);
 
             xmlHandler.popTag();
             xmlHandler.saveFile(xmlFilePath);
@@ -123,6 +124,7 @@ void GuiApp::setup(){
 	details.add(videoR.setup("red", ""));
 	details.add(videoG.setup("green", ""));
 	details.add(videoB.setup("blue", ""));
+	details.add(videoRythm.setup("rythm", ""));
 
     startButton.addListener(this, &GuiApp::startButtonPressed);
     manageButton.addListener(this, &GuiApp::manageButtonPressed);
@@ -217,6 +219,9 @@ void GuiApp::playVideo() {
 			videoR = ofToString(getR);
 			videoG = ofToString(getG);
 			videoB = ofToString(getB);
+
+			double getRythm = xmlHandler.getValue("rythm", -1.0);
+			videoRythm = ofToString(getRythm);
 
         }
 
