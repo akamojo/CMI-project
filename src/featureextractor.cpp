@@ -11,6 +11,9 @@ void FeatureExtractor::setup(std::string path)
 	this->prevHist = NULL;
 	this->rythm = -1.0;
 
+    this->skipStep = -1;
+    this->frameStep = -1;
+
 	this->avgColors.clear();
 	for (int i = 0; i < 3; i++) {
 		this->avgColors.push_back(-1.0);
@@ -42,9 +45,17 @@ void FeatureExtractor::calculate() {
 
     videoPlayer.load(tempFilename);
     videoPlayer.setLoopState(OF_LOOP_NONE);
+    videoPlayer.setVolume(0.0);
     videoPlayer.play();
 
+    skipStep = int( sqrt(((videoPlayer.getWidth() * videoPlayer.getHeight()) / (float) samplesPerFrame)) );
+    frameStep = int( videoPlayer.getTotalNumFrames() / framesPerVideo );
+
     ofLog(OF_LOG_NOTICE, "[LumExtractor] starts for " + videoFilePath + "...");
+
+    ofLog(OF_LOG_NOTICE, ofToString(skipStep) + ", frameStep: " + ofToString(frameStep));
+    ofLog(OF_LOG_NOTICE, ofToString(videoPlayer.getWidth()) + " " + ofToString(videoPlayer.getHeight()) + " "
+          + ofToString(videoPlayer.getTotalNumFrames()));
 
     double currentLumi;
 	vector<double> currentColors;
@@ -62,7 +73,6 @@ void FeatureExtractor::calculate() {
                 currentColors = this->calculateFrame();
                 luminance += currentColors[3];
 				rythm += this->calculateDiffBetweenFrames();
-                ofLog(OF_LOG_WARNING, ofToString(currentColors[3]));
 
 				for (int i = 0; i < 3; i++) {
 					avgColors[i] += currentColors[i];
@@ -149,6 +159,7 @@ double FeatureExtractor::calculateDiffBetweenFrames() {
 		);
 	}
 	cvCalcHist(&grayCVImg, hist);
+    cvNormalizeHist(hist, 255);
 
 	double diff = 0;
 

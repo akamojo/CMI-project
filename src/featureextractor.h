@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <vector>
+#include <math.h>
 
 class FeatureExtractor
 {
@@ -31,10 +32,12 @@ private:
     const double gc = 0.7152;
     const double bc = 0.0722;
 
-    const int skipStep = 100;
+    int skipStep; // 250 sampli per frame
+    const int samplesPerFrame = 250;
 
     int frameCounter;
-    const int frameStep = 100;
+    int frameStep; // 25 frame'ów
+    const int framesPerVideo = 25;
 
 	CvHistogram* prevHist = NULL;
 
@@ -43,7 +46,7 @@ private:
 	vector<double> avgColors;
 
     std::string videoFilePath = "?";
-    std::string tempFilename = "videos/temp.mp4";
+    std::string tempFilename = "videos/temp/temp.mp4";
     ofVideoPlayer videoPlayer;
 
 
