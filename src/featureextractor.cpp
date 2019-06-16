@@ -135,9 +135,9 @@ vector<double> FeatureExtractor::avgEdgeDistribution(vector<vector<double>> fram
 vector<double> FeatureExtractor::calculatePixel(ofPixels pixels, int i, int j, int vidWidth, int nChannels) {
 	vector<double> colors;
 
-	for (int k = 0; k < 3; k++) {
-		colors.push_back((double)pixels[(j * vidWidth + i) * nChannels + k]);
-	}
+    for (int k = 0; k < 3; k++) {
+        colors.push_back((double)pixels[(j * vidWidth + i) * nChannels + k]);
+    }
 
 	return colors;
 }

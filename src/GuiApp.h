@@ -27,6 +27,7 @@ public:
 
 	ofxPanel nav;
 	ofxPanel details;
+    const float detailsWidth = 400.0, detailsHeight = 400.0;
 
     ofxPanel startScreenNav;
     ofxButton startButton;
@@ -40,6 +41,7 @@ public:
 	ofxLabel videoG;
 	ofxLabel videoB;
 	ofxLabel videoRythm;
+    ofxLabel edgeHist;
 
 	ofxButton playButton;
 	ofxButton pauseButton;

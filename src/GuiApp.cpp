@@ -37,6 +37,11 @@ void GuiApp::createMetadatasFiles() {
             xmlHandler.addValue("blue", -1.0);
 			xmlHandler.addValue("rythm", -1.0);
 
+            xmlHandler.addTag("edgeHistogram");
+            xmlHandler.pushTag("edgeHistogram");
+            xmlHandler.addValue("edge", -1.0);
+            xmlHandler.popTag();
+
             xmlHandler.popTag();
             xmlHandler.saveFile(xmlFilePath);
 
@@ -115,16 +120,20 @@ void GuiApp::setup(){
 	stopButton.addListener(this, &GuiApp::stopButtonPressed);
 
 	details.setup();
-	details.add(videoName.setup("file", ""));
-	details.add(playButton.setup("play"));
-	details.add(pauseButton.setup("pause"));
-	details.add(stopButton.setup("stop"));
 
-    details.add(videoLuminance.setup("lumi", ""));
-	details.add(videoR.setup("red", ""));
-	details.add(videoG.setup("green", ""));
-	details.add(videoB.setup("blue", ""));
-	details.add(videoRythm.setup("rythm", ""));
+    details.setSize(detailsWidth, detailsHeight);
+
+    details.add(videoName.setup("file", "", detailsWidth));
+    details.add(playButton.setup("play", detailsWidth));
+    details.add(pauseButton.setup("pause", detailsWidth));
+    details.add(stopButton.setup("stop", detailsWidth));
+
+    details.add(videoLuminance.setup("lumi", "", detailsWidth));
+    details.add(videoR.setup("red", "", detailsWidth));
+    details.add(videoG.setup("green", "", detailsWidth));
+    details.add(videoB.setup("blue", "", detailsWidth));
+    details.add(videoRythm.setup("rythm", "", detailsWidth));
+    details.add(edgeHist.setup("edge hist", "", detailsWidth));
 
     startButton.addListener(this, &GuiApp::startButtonPressed);
     manageButton.addListener(this, &GuiApp::manageButtonPressed);
@@ -226,6 +235,18 @@ void GuiApp::playVideo() {
 
 			double getRythm = xmlHandler.getValue("rythm", -1.0);
 			videoRythm = ofToString(getRythm);
+
+            vector<double> edgesValues;
+            string edgesStr = "";
+
+            xmlHandler.pushTag("edgeHistogram");
+            int numberOfEdgeTypes = xmlHandler.getNumTags("edge");
+            for (int i = 0; i < numberOfEdgeTypes; ++i) {
+                edgesStr += ofToString(xmlHandler.getValue("edge", -1.0, i), 3);
+                if (i < numberOfEdgeTypes-1)
+                    edgesStr += " | ";
+            }
+            edgeHist = edgesStr;
 
         }
 

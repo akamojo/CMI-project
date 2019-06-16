@@ -48,12 +48,16 @@ void VideoBackgroundWorker::updateXMLWithVector(string path, string tag, string 
     if (xmlHandler.loadFile(xmlFilePath)) {
 
         xmlHandler.pushTag("metadata");
-        xmlHandler.addTag(tag);
+
+        if (!xmlHandler.tagExists(tag)) {
+            xmlHandler.addTag(tag);
+        }
         xmlHandler.pushTag(tag);
 
         double getCurrentValue = xmlHandler.getValue(subTag, missingValue);
         if (getCurrentValue == missingValue) {
             for (size_t i = 0; i < values.size(); ++i) {
+//                xmlHandler.setValue(subTag + ofToString(i+1), values[i], i);
                 xmlHandler.setValue(subTag, values[i], i);
             }
         }
