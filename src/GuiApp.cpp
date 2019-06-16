@@ -133,6 +133,8 @@ void GuiApp::setup(){
     startScreenNav.setPosition(camPreviewOffset, camPreviewOffset + camHeight + 30);
     startScreenNav.add(startButton.setup("START"));
     startScreenNav.add(manageButton.setup("MANAGE"));
+	startScreenNav.add(numberOfFaces.setup("num of faces", ""));
+	startScreenNav.add(rythmOfCaptured.setup("rythm", ""));
 
     playVideo();
 	ofSetVerticalSync(false);
@@ -147,6 +149,7 @@ void GuiApp::update(){
         {
             colorImg.setFromPixels(vidGrabber.getPixels());
             webCamPreviewFaceFinder.findHaarObjects(colorImg);
+			numberOfFaces = ofToString(webCamPreviewFaceFinder.blobs.size());
         }
     }
     else {
@@ -203,6 +206,7 @@ void GuiApp::playVideo() {
         mainPlayer.load(currentName);
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
         mainPlayer.play();
+		mainPlayer.setVolume(0.0);
 
         if (xmlHandler.loadFile(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml")) {
 			

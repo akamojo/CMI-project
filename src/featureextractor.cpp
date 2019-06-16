@@ -72,7 +72,9 @@ void FeatureExtractor::calculate() {
             if (frameCounter % frameStep == 0) {
                 currentColors = this->calculateFrame();
                 luminance += currentColors[3];
-				rythm += this->calculateDiffBetweenFrames();
+
+				if (this->calculateDiffBetweenFrames() > this->rythmThreshold)
+					rythm += 1;
 
 				for (int i = 0; i < 3; i++) {
 					avgColors[i] += currentColors[i];

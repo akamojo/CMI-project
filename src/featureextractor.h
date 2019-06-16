@@ -37,11 +37,12 @@ private:
 
     int frameCounter;
     int frameStep; // 25 frame'ów
-    const int framesPerVideo = 25;
+    const int framesPerVideo = 75;
 
 	CvHistogram* prevHist = NULL;
 
 	double rythm;
+	double rythmThreshold = 200;
     double luminance;
 	vector<double> avgColors;
 

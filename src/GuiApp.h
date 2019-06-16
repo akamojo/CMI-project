@@ -31,6 +31,8 @@ public:
     ofxPanel startScreenNav;
     ofxButton startButton;
     ofxButton manageButton;
+	ofxLabel numberOfFaces;
+	ofxLabel rythmOfCaptured;
 
     ofxLabel videoName;
     ofxLabel videoLuminance;
