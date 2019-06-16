@@ -111,7 +111,7 @@ void FeatureExtractor::calculate() {
         }
     }
 
-	rythm = rythm / (double)(frameCounter / frameStep);
+	rythm = (double)(frameCounter / frameStep) / rythm - 1.0;
 	ofLog(OF_LOG_NOTICE, "[RythmExtractor] RYTHM = " + ofToString(rythm));
 
     luminance = luminance / (double)(frameCounter / frameStep);
