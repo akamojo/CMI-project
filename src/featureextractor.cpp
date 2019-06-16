@@ -77,13 +77,18 @@ void FeatureExtractor::calculate() {
         }
 
         if (videoPlayer.isFrameNew()) {
-            this->frameCounter++;
             if (frameCounter % frameStep == 0) {
-                currentColors = this->calculateFrame();
-                luminance += currentColors[3];
 
                 colorImg.setFromPixels(videoPlayer.getPixels());
                 grayImg = colorImg;
+
+                if (frameCounter == 0) {
+                    this->calculateTextures(grayImg);
+                }
+
+                currentColors = this->calculateFrame();
+                luminance += currentColors[3];
+
 
                 if (this->calculateDiffBetweenFrames(grayImg) > this->rythmThreshold)
 					rythm += 1;
@@ -96,6 +101,7 @@ void FeatureExtractor::calculate() {
 				}
 
             }
+            this->frameCounter++;
         }
     }
 
@@ -111,6 +117,26 @@ void FeatureExtractor::calculate() {
 
     edgesHistogram = this->avgEdgeDistribution(framesEdgeHistograms);
     videoPlayer.close();    
+}
+
+vector<double> FeatureExtractor::calculateTextures(ofxCvGrayscaleImage grayImg) {
+    // to openCV
+    cv::Mat src = ofxCv::toCv(grayImg.getPixels());
+    cv::Mat gaborKernel, dst;
+
+    vector<double> result;
+    cv::Mat m, stdv;
+
+    for (int i = 0; i < sizeof(sigmas)/sizeof(double); ++i) {
+        for (int j = 0; j < sizeof(thetas)/sizeof(double); ++j) {
+            gaborKernel = cv::getGaborKernel(cv::Size(3, 3), sigmas[i], thetas[j], 10.0, 0.5);
+            cv::filter2D(src, dst, -1, gaborKernel);
+            cv::meanStdDev(dst, m, stdv);
+            cerr << "GABOR " << m << " " << stdv << endl;
+        }
+    }
+
+    return result;
 }
 
 vector<double> FeatureExtractor::avgEdgeDistribution(vector<vector<double>> framesHistograms) {

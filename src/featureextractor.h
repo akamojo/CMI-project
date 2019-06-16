@@ -68,6 +68,10 @@ private:
     const double threshold_value = 0.0;
     const double max_binary_value = 255.0;
 
+    vector<double> calculateTextures(ofxCvGrayscaleImage grayImg);
+    const double sigmas[4] = {3.0, 4.0, 5.0, 6.0};
+    const double thetas[7] = {22.5, 45.0, 67.5, 90.0, 123.75, 157.5, 180.0};
+
 };
 
 #endif // FEATUREEXTRACTOR_H
