@@ -6,6 +6,7 @@
 #include "featureextractor.h"
 #include "videobackgroundworker.h"
 #include "webcampreview.h"
+#include "webcamfeatureextractor.h"
 
 #include <ofxCvHaarFinder.h>
 #include <ofxXmlSettings.h>
@@ -58,8 +59,8 @@ public:
 
     WebCamPreview webCamPreview;
     bool startScreenMode = false;
-    ofxCvHaarFinder webCamPreviewFaceFinder;
-    ofImage colorImg;
+	WebcamFeatureExtractor webcamFeatureExtractor;
+	vector<ofxCvBlob> faces;
 
     ofVideoGrabber vidGrabber;
     int camWidth = 320;
@@ -84,7 +85,7 @@ public:
 	void keyPressed(int);
 
     void exit();
-    void updateXML(int videoIdx, string tag, double value);
+    //void updateXML(int videoIdx, string tag, double value);
 private:
     void setupVidGrabber();
     void checkVidGrabberDevices();
