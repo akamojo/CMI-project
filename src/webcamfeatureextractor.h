@@ -38,7 +38,7 @@ private:
 	//const int samplesPerFrame = 250;
 
 	int frameCounter;
-	int frameStep = 10; // 25 frame'ów
+	int frameStep = 7; // 25 frame'ów
 	//const int framesPerVideo = 75;
 
 	CvHistogram* prevHist = NULL;

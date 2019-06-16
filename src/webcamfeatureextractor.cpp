@@ -34,15 +34,18 @@ vector<double> WebcamFeatureExtractor::getAvgColors()
 
 double WebcamFeatureExtractor::getRythm()
 {
-	return rythm / (double)(frameCounter / frameStep);
+	return rythm;	// / (double)(frameCounter / frameStep);
 }
 
 void WebcamFeatureExtractor::calculate(ofVideoGrabber vidGrabber) {
 
 	this->frameCounter++;
+	double diff;
+
 	if (frameCounter % frameStep == 0) {
-		if (this->calculateDiffBetweenFrames(vidGrabber) > this->rythmThreshold)
-			rythm += 1;
+		diff = this->calculateDiffBetweenFrames(vidGrabber);
+		if (diff != 0)
+			rythm = (double) 255.0 / diff - 1.0;
 	}
 }
 
