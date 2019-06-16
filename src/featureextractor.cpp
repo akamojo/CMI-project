@@ -51,14 +51,18 @@ void FeatureExtractor::calculate() {
     skipStep = int( sqrt(((videoPlayer.getWidth() * videoPlayer.getHeight()) / (float) samplesPerFrame)) );
     frameStep = int( videoPlayer.getTotalNumFrames() / framesPerVideo );
 
-    ofLog(OF_LOG_NOTICE, "[LumExtractor] starts for " + videoFilePath + "...");
+    ofLog(OF_LOG_NOTICE, "[FeatureExtractor] starts for " + videoFilePath + "...");
 
-    ofLog(OF_LOG_NOTICE, ofToString(skipStep) + ", frameStep: " + ofToString(frameStep));
-    ofLog(OF_LOG_NOTICE, ofToString(videoPlayer.getWidth()) + " " + ofToString(videoPlayer.getHeight()) + " "
-          + ofToString(videoPlayer.getTotalNumFrames()));
+//    ofLog(OF_LOG_NOTICE, ofToString(skipStep) + ", frameStep: " + ofToString(frameStep));
+//    ofLog(OF_LOG_NOTICE, ofToString(videoPlayer.getWidth()) + " " + ofToString(videoPlayer.getHeight()) + " "
+//          + ofToString(videoPlayer.getTotalNumFrames()));
 
     double currentLumi;
 	vector<double> currentColors;
+    vector<vector<double>> framesEdgeHistograms;
+
+    ofxCvColorImage colorImg;
+    ofxCvGrayscaleImage grayImg;
 
     while (true) {
 
@@ -73,8 +77,14 @@ void FeatureExtractor::calculate() {
                 currentColors = this->calculateFrame();
                 luminance += currentColors[3];
 
-				if (this->calculateDiffBetweenFrames() > this->rythmThreshold)
+                colorImg.setFromPixels(videoPlayer.getPixels());
+                grayImg = colorImg;
+
+                if (this->calculateDiffBetweenFrames(grayImg) > this->rythmThreshold)
 					rythm += 1;
+
+                vector<double> currentEdgeDistribution = this->calculateEdgeDistribution(grayImg);
+                framesEdgeHistograms.push_back(currentEdgeDistribution);
 
 				for (int i = 0; i < 3; i++) {
 					avgColors[i] += currentColors[i];
@@ -94,7 +104,27 @@ void FeatureExtractor::calculate() {
 		avgColors[i] /= (double)(frameCounter / frameStep);
 	}
 
+    edgesHistogram = this->avgEdgeDistribution(framesEdgeHistograms);
+
     videoPlayer.close();    
+}
+
+vector<double> avgEdgeDistribution(vector<vector<double>> framesHistograms) {
+
+    vector<double> result(framesHistograms[0].size(), 0.0);
+    // for each frame
+    for (size_t i = 0; i < framesHistograms.size(); ++i) {
+        // for each edge type
+        for (size_t j = 0; j < framesHistograms[i].size(); ++j) {
+            result[j] += framesHistograms[i][j];
+        }
+    }
+
+    for (size_t i = 0; i < result.size(); ++i) {
+        result[i] /= (double) result.size();
+    }
+
+    return result;
 }
 
 vector<double> FeatureExtractor::calculatePixel(ofPixels pixels, int i, int j, int vidWidth, int nChannels) {
@@ -137,13 +167,33 @@ vector<double> FeatureExtractor::calculateFrame() {
     return vresult;
 }
 
-double FeatureExtractor::calculateDiffBetweenFrames() {
+vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage grayImg) {
 
-	ofxCvColorImage colorImg;
-	ofxCvGrayscaleImage grayImg;
+    // to openCV
+    cv::Mat src = ofxCv::toCv(grayImg.getPixels());
+    cv::Mat blurred, edges, binarized, kernel;
 
-	colorImg.setFromPixels(videoPlayer.getPixels());
-	grayImg = colorImg;
+    // blur
+    GaussianBlur(src, blurred, cv::Size(3, 3), 0);
+
+    vector<double> result;
+    double edges_ratio;
+
+    // apply different edge filters
+    for (int i = 0; i < kernelsNum; i++) {
+        kernel = cv::Mat(2, 2, CV_32F, kernels[i]);
+
+        cv::filter2D(blurred, edges, -1, kernel);
+        cv::threshold(edges, binarized, threshold_value, max_binary_value, cv::THRESH_BINARY);
+
+        edges_ratio = (double)cv::countNonZero(binarized) / (double)(edges.rows * edges.cols);
+        result.push_back(edges_ratio);
+    }
+
+    return result;
+}
+
+double FeatureExtractor::calculateDiffBetweenFrames(ofxCvGrayscaleImage grayImg) {
 
 	IplImage* grayCVImg = grayImg.getCvImage();
 	int g_bins = 32;

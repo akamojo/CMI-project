@@ -3,6 +3,8 @@
 
 #include <ofVideoPlayer.h>
 #include "ofMain.h"
+#include "ofxCv.h"
+
 #include "ofxCvColorImage.h"
 #include "ofxCvGrayscaleImage.h"
 
@@ -23,7 +25,9 @@ public:
 
 private:
     vector<double> calculateFrame();
-	double calculateDiffBetweenFrames();
+    double calculateDiffBetweenFrames(ofxCvGrayscaleImage grayImg);
+    vector<double> calculateEdgeDistribution(ofxCvGrayscaleImage grayImg);
+    vector<double> avgEdgeDistribution(vector<vector<double>> framesHistograms);
 
     void convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight);
     vector <double> calculatePixel(ofPixels, int i, int j, int vidWidth, int nChannels);
@@ -45,11 +49,23 @@ private:
 	double rythmThreshold = 200;
     double luminance;
 	vector<double> avgColors;
+    vector<double> edgesHistogram;
 
     std::string videoFilePath = "?";
     std::string tempFilename = "videos/temp/temp.mp4";
     ofVideoPlayer videoPlayer;
 
+    // Edge Distribution variables
+    const int kernelsNum = 5;
+    float kernels[5][4] = {
+        {1, 1, -1, -1},
+        {1, -1, 1, -1},
+        {2, 0, 0, -2},
+        {0, 2, -2, 0},
+        {2, -2, -2, 2}
+    };
+    const double threshold_value = 15.0;
+    const double max_binary_value = 255.0;
 
 };
 
