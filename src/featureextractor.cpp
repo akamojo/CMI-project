@@ -36,7 +36,12 @@ vector<double> FeatureExtractor::getAvgColors()
 
 double FeatureExtractor::getRythm()
 {
-	return rythm;
+    return rythm;
+}
+
+vector<double> FeatureExtractor::getEdgeDistribution()
+{
+    return edgesHistogram;
 }
 
 void FeatureExtractor::calculate() {
@@ -105,11 +110,10 @@ void FeatureExtractor::calculate() {
 	}
 
     edgesHistogram = this->avgEdgeDistribution(framesEdgeHistograms);
-
     videoPlayer.close();    
 }
 
-vector<double> avgEdgeDistribution(vector<vector<double>> framesHistograms) {
+vector<double> FeatureExtractor::avgEdgeDistribution(vector<vector<double>> framesHistograms) {
 
     vector<double> result(framesHistograms[0].size(), 0.0);
     // for each frame
@@ -122,6 +126,7 @@ vector<double> avgEdgeDistribution(vector<vector<double>> framesHistograms) {
 
     for (size_t i = 0; i < result.size(); ++i) {
         result[i] /= (double) result.size();
+        ofLog(OF_LOG_NOTICE, "[E d g e s] " + ofToString(result[i]));
     }
 
     return result;
@@ -183,7 +188,7 @@ vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage g
     for (int i = 0; i < kernelsNum; i++) {
         kernel = cv::Mat(2, 2, CV_32F, kernels[i]);
 
-        cv::filter2D(blurred, edges, -1, kernel);
+        cv::filter2D(blurred, edges, CV_32F, kernel); // ? CV_32F - > -1?
         cv::threshold(edges, binarized, threshold_value, max_binary_value, cv::THRESH_BINARY);
 
         edges_ratio = (double)cv::countNonZero(binarized) / (double)(edges.rows * edges.cols);

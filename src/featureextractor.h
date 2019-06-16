@@ -20,6 +20,7 @@ public:
     double getLuminance();
 	vector<double> getAvgColors();
 	double getRythm();
+    vector<double> getEdgeDistribution();
 
     void calculate();
 
@@ -60,8 +61,8 @@ private:
     float kernels[5][4] = {
         {1, 1, -1, -1},
         {1, -1, 1, -1},
-        {2, 0, 0, -2},
-        {0, 2, -2, 0},
+        {1.41f, 0.0f, 0.0f, -1.41f},
+        {0.0f, 1.41f, -1.41f, 0.0f},
         {2, -2, -2, 2}
     };
     const double threshold_value = 15.0;
