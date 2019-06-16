@@ -84,7 +84,7 @@ void GuiApp::setup(){
     // START SCREEN
 
     checkVidGrabberDevices();
-    webCamPreviewFaceFinder.setup("haarcascade_frontalface_default.xml");
+	webcamFeatureExtractor.setup();
     setupVidGrabber();
     ofBackground(0);
 
@@ -172,9 +172,11 @@ void GuiApp::update(){
 
         if (vidGrabber.isFrameNew())
         {
-            colorImg.setFromPixels(vidGrabber.getPixels());
-            webCamPreviewFaceFinder.findHaarObjects(colorImg);
-			numberOfFaces = ofToString(webCamPreviewFaceFinder.blobs.size());
+			faces = webcamFeatureExtractor.detectFaces(vidGrabber);
+			numberOfFaces = ofToString(faces.size());
+
+			webcamFeatureExtractor.calculate(vidGrabber);
+			rythmOfCaptured = ofToString(webcamFeatureExtractor.getRythm());
         }
     }
     else {
@@ -193,9 +195,9 @@ void GuiApp::draw(){
         vidGrabber.draw(camPreviewOffset, camPreviewOffset);
         startScreenNav.draw();
 
-        for (unsigned int i = 0; i < webCamPreviewFaceFinder.blobs.size(); i++)
+        for (unsigned int i = 0; i < faces.size(); i++)
         {
-            ofRectangle cur = webCamPreviewFaceFinder.blobs[i].boundingRect;
+            ofRectangle cur = faces[i].boundingRect;
             ofRect(cur.x + camPreviewOffset, cur.y + camPreviewOffset, cur.width, cur.height);
         }
 
