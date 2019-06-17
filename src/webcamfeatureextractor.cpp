@@ -36,7 +36,10 @@ vector<ofxCvBlob> WebcamFeatureExtractor::detectFaces(ofVideoGrabber vidGrabber)
 
 	vector<ofxCvBlob> faces;
 	for (int i = 0; i < webcamFaceFinder.blobs.size(); i++) {
-		if (webcamFaceFinder.blobs[i].area > faceAreaThreshold)
+		if (webcamFaceFinder.blobs[i].area > faceAreaThreshold &&
+			!webcamFaceFinder.blobs[i].hole)
+			//webcamFaceFinder.blobs[i].boundingRect.getWidth() < webcamFaceFinder.blobs[i].boundingRect.getHeight())
+
 			faces.push_back(webcamFaceFinder.blobs[i]);
 	}
 
