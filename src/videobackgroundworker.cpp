@@ -59,8 +59,9 @@ void VideoBackgroundWorker::threadedFunction()
             double getLumi = xmlHandler.getValue("luminance", -1.0);
             double getRed = xmlHandler.getValue("red", -1.0);
 			double getRythm = xmlHandler.getValue("rythm", -1.0);
+			int getFaces = xmlHandler.getValue("facesnum", -1);
 
-            if (getLumi == -1.0 || getRed == -1.0 || getRythm == -1.0) {
+            if (getLumi == -1.0 || getRed == -1.0 || getRythm == -1.0 || getFaces == -1) {
 
                 ofLog(OF_LOG_NOTICE, "[BG Worker] Calculating features ");
 
@@ -80,6 +81,10 @@ void VideoBackgroundWorker::threadedFunction()
 				getRythm = extractor.getRythm();
 				updateXML(videoName, "rythm", getRythm, -1.0);
 				ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with " + ofToString(getRythm));
+
+				getFaces = extractor.getNumberOfFaces();
+				updateXML(videoName, "facesnum", getFaces, -1);
+				ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with " + ofToString(getFaces));
             }
 
         }

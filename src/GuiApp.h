@@ -40,6 +40,7 @@ public:
 	ofxLabel videoG;
 	ofxLabel videoB;
 	ofxLabel videoRythm;
+	ofxLabel videoNumOfFaces;
 
 	ofxButton playButton;
 	ofxButton pauseButton;

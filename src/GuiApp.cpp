@@ -125,6 +125,7 @@ void GuiApp::setup(){
 	details.add(videoG.setup("green", ""));
 	details.add(videoB.setup("blue", ""));
 	details.add(videoRythm.setup("rythm", ""));
+	details.add(videoNumOfFaces.setup("num of faces", ""));
 
     startButton.addListener(this, &GuiApp::startButtonPressed);
     manageButton.addListener(this, &GuiApp::manageButtonPressed);
@@ -227,6 +228,8 @@ void GuiApp::playVideo() {
 			double getRythm = xmlHandler.getValue("rythm", -1.0);
 			videoRythm = ofToString(getRythm);
 
+			int getFaces = xmlHandler.getValue("facesnum", -1);
+			videoNumOfFaces = ofToString(getFaces);
         }
 
         details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50,

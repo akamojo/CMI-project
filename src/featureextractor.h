@@ -10,6 +10,9 @@
 #include <vector>
 #include <math.h>
 
+#include <ofxCvHaarFinder.h>
+#include <ofxXmlSettings.h>
+
 class FeatureExtractor
 {
 public:
@@ -18,12 +21,14 @@ public:
     double getLuminance();
 	vector<double> getAvgColors();
 	double getRythm();
+	int getNumberOfFaces();
 
     void calculate();
 
 private:
     vector<double> calculateFrame();
 	double calculateDiffBetweenFrames();
+	int detectFaces();
 
     void convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight);
     vector <double> calculatePixel(ofPixels, int i, int j, int vidWidth, int nChannels);
@@ -41,6 +46,10 @@ private:
 
 	CvHistogram* prevHist = NULL;
 
+	ofxCvHaarFinder faceFinder;
+	ofImage colorImg;
+	int numberOfFaces;
+
 	double rythm;
 	double rythmThreshold = 200;
     double luminance;
@@ -49,7 +58,6 @@ private:
     std::string videoFilePath = "?";
     std::string tempFilename = "videos/temp/temp.mp4";
     ofVideoPlayer videoPlayer;
-
 
 };
 

@@ -10,6 +10,7 @@ void FeatureExtractor::setup(std::string path)
     this->luminance = -1.0;
 	this->prevHist = NULL;
 	this->rythm = -1.0;
+	this->numberOfFaces = 0;
 
     this->skipStep = -1;
     this->frameStep = -1;
@@ -18,6 +19,8 @@ void FeatureExtractor::setup(std::string path)
 	for (int i = 0; i < 3; i++) {
 		this->avgColors.push_back(-1.0);
 	}
+
+	this->faceFinder.setup("haarcascade_frontalface_default.xml");
 
     ofFile fileToRead(path);
     fileToRead.copyTo(tempFilename, true, true);
@@ -37,6 +40,11 @@ vector<double> FeatureExtractor::getAvgColors()
 double FeatureExtractor::getRythm()
 {
 	return rythm;
+}
+
+int FeatureExtractor::getNumberOfFaces()
+{
+	return numberOfFaces;
 }
 
 void FeatureExtractor::calculate() {
@@ -81,6 +89,7 @@ void FeatureExtractor::calculate() {
 				}
 
             }
+			numberOfFaces = max(numberOfFaces, detectFaces());
         }
     }
 
@@ -90,11 +99,20 @@ void FeatureExtractor::calculate() {
     luminance = luminance / (double)(frameCounter / frameStep);
     ofLog(OF_LOG_NOTICE, "[LumExtractor] LUMI = " + ofToString(luminance));
 
+	ofLog(OF_LOG_NOTICE, "[NumberOfFaces] NUMOFFAC = " + ofToString(numberOfFaces));
+
 	for (int i = 0; i < 3; i++) {
 		avgColors[i] /= (double)(frameCounter / frameStep);
 	}
 
     videoPlayer.close();    
+}
+
+int FeatureExtractor::detectFaces()
+{
+	colorImg.setFromPixels(videoPlayer.getPixels());
+	faceFinder.findHaarObjects(colorImg);
+	return faceFinder.blobs.size();
 }
 
 vector<double> FeatureExtractor::calculatePixel(ofPixels pixels, int i, int j, int vidWidth, int nChannels) {
