@@ -114,8 +114,8 @@ int FeatureExtractor::detectFaces()
 	faceFinder.findHaarObjects(colorImg);
 	int counter = 0;
 	for (int i = 0; i < faceFinder.blobs.size(); i++) {
-		if (faceFinder.blobs[i].area > faceAreaThreshold && 
-			faceFinder.blobs[i].boundingRect.getWidth() < faceFinder.blobs[i].boundingRect.getHeight())
+		if (faceFinder.blobs[i].area > faceAreaThreshold && !faceFinder.blobs[i].hole) 
+			//faceFinder.blobs[i].boundingRect.getWidth() < faceFinder.blobs[i].boundingRect.getHeight())
 			counter++;
 	}
 	return counter;
