@@ -58,6 +58,7 @@ void FeatureExtractor::calculate() {
           + ofToString(videoPlayer.getTotalNumFrames()));
 
     double currentLumi;
+	double diff;
 	vector<double> currentColors;
 
     while (true) {
@@ -73,8 +74,11 @@ void FeatureExtractor::calculate() {
                 currentColors = this->calculateFrame();
                 luminance += currentColors[3];
 
-				if (this->calculateDiffBetweenFrames() > this->rythmThreshold)
-					rythm += 1;
+				//if (this->calculateDiffBetweenFrames() > this->rythmThreshold)
+				//	rythm += 1;
+
+				diff = this->calculateDiffBetweenFrames();
+				rythm += 1 - diff / (double) 255.0;
 
 				for (int i = 0; i < 3; i++) {
 					avgColors[i] += currentColors[i];
@@ -84,7 +88,7 @@ void FeatureExtractor::calculate() {
         }
     }
 
-	rythm = (double)(frameCounter / frameStep) / rythm - 1.0;
+	rythm = rythm / (double)(frameCounter / frameStep);
 	ofLog(OF_LOG_NOTICE, "[RythmExtractor] RYTHM = " + ofToString(rythm));
 
     luminance = luminance / (double)(frameCounter / frameStep);
