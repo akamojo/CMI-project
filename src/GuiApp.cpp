@@ -159,9 +159,13 @@ void GuiApp::setup(){
     startScreenNav.add(startButton.setup("START"));
     startScreenNav.add(manageButton.setup("MANAGE"));
 	startScreenNav.add(numberOfFaces.setup("num of faces", ""));
-	startScreenNav.add(rythmOfCaptured.setup("rythm", ""));
+	startScreenNav.add(capturedRythm.setup("rythm", ""));
+	startScreenNav.add(capturedR.setup("red", ""));
+	startScreenNav.add(capturedG.setup("green", ""));
+	startScreenNav.add(capturedB.setup("blue", ""));
+	startScreenNav.add(capturedLuminance.setup("lumi", ""));
 
-    playVideo();
+    playVideo(-1);
 	ofSetVerticalSync(false);
 }
 
@@ -176,16 +180,25 @@ void GuiApp::update(){
 			numberOfFaces = ofToString(faces.size());
 
 			webcamFeatureExtractor.calculate(vidGrabber);
-			rythmOfCaptured = ofToString(webcamFeatureExtractor.getRythm());
+			capturedRythm = ofToString(webcamFeatureExtractor.getRythm());
+
+			vector<double> getColors = webcamFeatureExtractor.getColors();
+			capturedR = ofToString(getColors[0]);
+			capturedG = ofToString(getColors[1]);
+			capturedB = ofToString(getColors[2]);
+
+			capturedLuminance = ofToString(webcamFeatureExtractor.getLuminance());
+
         }
     }
     else {
         for (int i = 0; i < (int)thumbnails.size(); i++) {
             thumbnails[i]->video.update();
             thumbnails[i]->update();
-        }
-        mainPlayer.update();    
+        } 
     }
+
+	mainPlayer.update();
 
 }
 
@@ -200,6 +213,9 @@ void GuiApp::draw(){
             ofRectangle cur = faces[i].boundingRect;
             ofRect(cur.x + camPreviewOffset, cur.y + camPreviewOffset, cur.width, cur.height);
         }
+
+		if (clickedStart)
+			mainPlayer.draw(thumbnailsOffset + 2 * thumbnails[0]->thumbnailSize + 50, 20, mainPlayerWidth, mainPlayerHeight);
 
         ofSetHexColor(0xffffff);
         ofNoFill();
@@ -226,10 +242,13 @@ void GuiApp::draw(){
 
 }
 
-void GuiApp::playVideo() {
+void GuiApp::playVideo(int idx) {
 
-    if (currentVideo < thumbnails.size() && currentVideo >= 0) {
-        string currentName = thumbnails[currentVideo]->name;
+	if (idx == -1)
+		idx = currentVideo;
+
+    if (idx < thumbnails.size() && idx >= 0) {
+        string currentName = thumbnails[idx]->name;
 
         mainPlayer.load(currentName);
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
@@ -246,7 +265,6 @@ void GuiApp::playVideo() {
 void GuiApp::readXML(string videoXMLPath) {
 
     if (xmlHandler.loadFile(videoXMLPath)) {
-
         xmlHandler.pushTag("metadata");
         videoName = xmlHandler.getValue("name", "?");
         videoResolution = xmlHandler.getValue("resolution", "?");
@@ -310,7 +328,7 @@ void GuiApp::downButtonPressed() {
         for (int i = 0; i < thumbnailIdxOffset; i++)
 			thumbnails[i]->enabled = false;
 		
-		playVideo();
+		playVideo(-1);
 	}
 }
 
@@ -324,7 +342,7 @@ void GuiApp::upButtonPressed() {
         for (int i = thumbnailIdxOffset; i < (int)thumbnails.size(); i++)
 			thumbnails[i]->enabled = false;
 		
-		playVideo();
+		playVideo(-1);
 	}
 }
 
@@ -366,11 +384,38 @@ void GuiApp::stopButtonPressed() {
 
 void GuiApp::startButtonPressed()
 {
+	clickedStart = true;
+	vector<double> vec = calculateDifferences();
+	playVideo(std::min_element(vec.begin(), vec.end()) - vec.begin());
+}
 
+vector<double> GuiApp::calculateDifferences()
+{
+	vector<double> differences;
+
+	for (int i = 0; i < thumbnails.size(); i++) {
+		if (xmlHandler.loadFile(ofSplitString(dir.getPath(i), ".")[0] + ".xml")) {
+
+			xmlHandler.pushTag("metadata");
+			videoName = xmlHandler.getValue("name", "?");
+			
+			double diff = 0;
+			diff += abs(xmlHandler.getValue("luminance", 10000.0) 
+				- ofToDouble(capturedLuminance)) / (double) 255.0;
+			diff += abs(xmlHandler.getValue("rythm", 10000.0) - ofToDouble(capturedRythm));
+
+			cout << dir.getPath(i) << " " << diff << endl;
+			differences.push_back(diff);
+		}
+	}
+
+	return differences;
 }
 
 void GuiApp::manageButtonPressed()
 {
+	clickedStart = false;
+
     if (startScreenMode)
         startScreenMode = false;
 }
@@ -386,7 +431,7 @@ void GuiApp::keyPressed(int key) {
         currentVideo = thumbnailIdxOffset;
     }
 
-	playVideo();
+	playVideo(-1);
 }
 
 void GuiApp::exit() {

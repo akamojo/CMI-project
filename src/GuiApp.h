@@ -34,7 +34,11 @@ public:
     ofxButton startButton;
     ofxButton manageButton;
 	ofxLabel numberOfFaces;
-	ofxLabel rythmOfCaptured;
+	ofxLabel capturedLuminance;
+	ofxLabel capturedR;
+	ofxLabel capturedG;
+	ofxLabel capturedB;
+	ofxLabel capturedRythm;
 
     ofxLabel videoName;
     ofxLabel videoResolution;
@@ -88,14 +92,16 @@ public:
     void startButtonPressed();
     void manageButtonPressed();
 
-	void playVideo();
+	void playVideo(int);
 	void keyPressed(int);
 
     void exit();
-    void updateXML(int videoIdx, string tag, double value);
+    //void updateXML(int videoIdx, string tag, double value);
 private:
+	bool clickedStart = false;
     void setupVidGrabber();
     void checkVidGrabberDevices();
     void readXML(string videoXMLPath);
+	vector<double> calculateDifferences();
 };
 
