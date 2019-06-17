@@ -88,8 +88,8 @@ void FeatureExtractor::calculate() {
 					avgColors[i] += currentColors[i];
 				}
 
+				numberOfFaces = max(numberOfFaces, detectFaces());
             }
-			numberOfFaces = max(numberOfFaces, detectFaces());
         }
     }
 
@@ -112,7 +112,13 @@ int FeatureExtractor::detectFaces()
 {
 	colorImg.setFromPixels(videoPlayer.getPixels());
 	faceFinder.findHaarObjects(colorImg);
-	return faceFinder.blobs.size();
+	int counter = 0;
+	for (int i = 0; i < faceFinder.blobs.size(); i++) {
+		if (faceFinder.blobs[i].area > faceAreaThreshold && 
+			faceFinder.blobs[i].boundingRect.getWidth() < faceFinder.blobs[i].boundingRect.getHeight())
+			counter++;
+	}
+	return counter;
 }
 
 vector<double> FeatureExtractor::calculatePixel(ofPixels pixels, int i, int j, int vidWidth, int nChannels) {

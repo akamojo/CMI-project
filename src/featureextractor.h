@@ -49,6 +49,7 @@ private:
 	ofxCvHaarFinder faceFinder;
 	ofImage colorImg;
 	int numberOfFaces;
+	int faceAreaThreshold = 5000;
 
 	double rythm;
 	double rythmThreshold = 200;
