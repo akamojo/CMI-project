@@ -9,7 +9,7 @@ void WebcamFeatureExtractor::setup(std::string fileName)
 	this->prevHist = NULL;
 	this->rythm = 0.0;
 
-	webCamPreviewFaceFinder.setup(fileName);
+	webcamFaceFinder.setup(fileName);
 }
 
 double WebcamFeatureExtractor::getRythm()
@@ -32,8 +32,15 @@ void WebcamFeatureExtractor::calculate(ofVideoGrabber vidGrabber) {
 vector<ofxCvBlob> WebcamFeatureExtractor::detectFaces(ofVideoGrabber vidGrabber) {
 	ofImage colorImg; 
 	colorImg.setFromPixels(vidGrabber.getPixels());
-	webCamPreviewFaceFinder.findHaarObjects(colorImg);
-	return webCamPreviewFaceFinder.blobs;
+	webcamFaceFinder.findHaarObjects(colorImg);
+
+	vector<ofxCvBlob> faces;
+	for (int i = 0; i < webcamFaceFinder.blobs.size(); i++) {
+		if (webcamFaceFinder.blobs[i].area > faceAreaThreshold)
+			faces.push_back(webcamFaceFinder.blobs[i]);
+	}
+
+	return faces;
 }
 
 double WebcamFeatureExtractor::calculateDiffBetweenFrames(ofVideoGrabber vidGrabber) {
