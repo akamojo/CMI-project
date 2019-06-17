@@ -48,6 +48,10 @@ std::string FeatureExtractor::getVideoResolution() {
     return resolutionStr;
 }
 
+vector<double> FeatureExtractor::getTextureMoments() {
+    return textureMoments;
+}
+
 void FeatureExtractor::calculate() {
 
     if (videoFilePath == "?") return;
@@ -61,10 +65,6 @@ void FeatureExtractor::calculate() {
     frameStep = int( videoPlayer.getTotalNumFrames() / framesPerVideo );
 
     ofLog(OF_LOG_NOTICE, "[FeatureExtractor] starts for " + videoFilePath + "...");
-
-//    ofLog(OF_LOG_NOTICE, ofToString(skipStep) + ", frameStep: " + ofToString(frameStep));
-//    ofLog(OF_LOG_NOTICE, ofToString(videoPlayer.getWidth()) + " " + ofToString(videoPlayer.getHeight()) + " "
-//          + ofToString(videoPlayer.getTotalNumFrames()));
 
     double currentLumi;
 	vector<double> currentColors;
@@ -89,7 +89,7 @@ void FeatureExtractor::calculate() {
                 if (frameCounter == 0) {
                     // first frame
                     resolutionStr = ofToString(videoPlayer.getWidth()) + " x " + ofToString(videoPlayer.getHeight());
-                    this->calculateTextures(grayImg);
+                    textureMoments = this->calculateTextures(grayImg);
                 }
 
                 currentColors = this->calculateFrame();
@@ -122,6 +122,7 @@ void FeatureExtractor::calculate() {
 	}
 
     edgesHistogram = this->avgEdgeDistribution(framesEdgeHistograms);
+
     videoPlayer.close();    
 }
 
@@ -138,6 +139,8 @@ vector<double> FeatureExtractor::calculateTextures(ofxCvGrayscaleImage grayImg) 
             gaborKernel = cv::getGaborKernel(cv::Size(3, 3), sigmas[i], thetas[j], 10.0, 0.5);
             cv::filter2D(src, dst, -1, gaborKernel);
             cv::meanStdDev(dst, m, stdv);
+            result.push_back(m.at<double>(0));
+            result.push_back(stdv.at<double>(0));
         }
     }
 

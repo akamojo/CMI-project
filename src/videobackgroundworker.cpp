@@ -153,6 +153,10 @@ void VideoBackgroundWorker::threadedFunction()
                 updateXMLWithVector(videoName, "edgeHistogram", "edge", edgeDistribution, -1);
                 ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with edge distribution");
 
+                vector<double> textureMoments = extractor.getTextureMoments();
+                updateXMLWithVector(videoName, "textureMoments", "tex", textureMoments, -1);
+                ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with texture moments");
+
             }
 
         }

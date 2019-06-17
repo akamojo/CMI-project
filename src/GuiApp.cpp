@@ -44,6 +44,11 @@ void GuiApp::createMetadatasFiles() {
             xmlHandler.addValue("edge", -1.0);
             xmlHandler.popTag();
 
+            xmlHandler.addTag("textureMoments");
+            xmlHandler.pushTag("textureMoments");
+            xmlHandler.addValue("tex", -1.0);
+            xmlHandler.popTag();
+
             xmlHandler.popTag();
             xmlHandler.saveFile(xmlFilePath);
 
@@ -123,15 +128,19 @@ void GuiApp::setup(){
 
 	details.setup();
 
+    detailsWidth = mainPlayerWidth;
     details.setSize(detailsWidth, detailsHeight);
 
+    // VIDEO BASIC INFO
     details.add(videoName.setup("file", "", detailsWidth));
     details.add(videoResolution.setup("size", "", detailsWidth));
 
+    // VIDEO NAVIGATION
     details.add(playButton.setup("play", detailsWidth));
     details.add(pauseButton.setup("pause", detailsWidth));
     details.add(stopButton.setup("stop", detailsWidth));
 
+    // VIDEO FEATURES
     details.add(videoLuminance.setup("lumi", "", detailsWidth));
     details.add(videoR.setup("red", "", detailsWidth));
     details.add(videoG.setup("green", "", detailsWidth));
@@ -139,8 +148,11 @@ void GuiApp::setup(){
     details.add(videoRythm.setup("rythm", "", detailsWidth));
     details.add(edgeHist.setup("edge hist", "", detailsWidth));
 
+    // BUTTONS
     startButton.addListener(this, &GuiApp::startButtonPressed);
     manageButton.addListener(this, &GuiApp::manageButtonPressed);
+
+    // START SCREEN
 
     startScreenNav.setup();
     startScreenNav.setPosition(camPreviewOffset, camPreviewOffset + camHeight + 30);
@@ -193,6 +205,7 @@ void GuiApp::draw(){
     else {
         nav.draw();
         details.draw();
+        ofDrawBitmapString(texMomentsString, details.getPosition().x, details.getPosition().y + details.getHeight() + 20.0);
 
         if (dir.size() > 0) {
             ofSetColor(ofColor::white);
@@ -220,46 +233,71 @@ void GuiApp::playVideo() {
         mainPlayer.setLoopState(OF_LOOP_NORMAL);
         mainPlayer.play();
 		mainPlayer.setVolume(0.0);
-
-        if (xmlHandler.loadFile(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml")) {
-			
-			xmlHandler.pushTag("metadata");
-            videoName = xmlHandler.getValue("name", "?");
-            videoResolution = xmlHandler.getValue("resolution", "?");
-
-            double getLumi = xmlHandler.getValue("luminance", -1.0);
-            videoLuminance = ofToString(getLumi);
-
-			double getR = xmlHandler.getValue("red", -1.0);
-			double getG = xmlHandler.getValue("green", -1.0);
-			double getB = xmlHandler.getValue("blue", -1.0);
-
-			videoR = ofToString(getR);
-			videoG = ofToString(getG);
-			videoB = ofToString(getB);
-
-			double getRythm = xmlHandler.getValue("rythm", -1.0);
-			videoRythm = ofToString(getRythm);
-
-            vector<double> edgesValues;
-            string edgesStr = "";
-
-            xmlHandler.pushTag("edgeHistogram");
-            int numberOfEdgeTypes = xmlHandler.getNumTags("edge");
-            for (int i = 0; i < numberOfEdgeTypes; ++i) {
-                edgesStr += ofToString(xmlHandler.getValue("edge", -1.0, i), 3);
-                if (i < numberOfEdgeTypes-1)
-                    edgesStr += " | ";
-            }
-            edgeHist = edgesStr;
-
-        }
+        this->readXML(ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml");
 
         details.setPosition(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50,
             20 + mainPlayerHeight + 10);
 
 	}
 }
+
+void GuiApp::readXML(string videoXMLPath) {
+
+    if (xmlHandler.loadFile(videoXMLPath)) {
+
+        xmlHandler.pushTag("metadata");
+        videoName = xmlHandler.getValue("name", "?");
+        videoResolution = xmlHandler.getValue("resolution", "?");
+
+        double getLumi = xmlHandler.getValue("luminance", -1.0);
+        videoLuminance = ofToString(getLumi);
+
+        double getR = xmlHandler.getValue("red", -1.0);
+        double getG = xmlHandler.getValue("green", -1.0);
+        double getB = xmlHandler.getValue("blue", -1.0);
+
+        videoR = ofToString(getR);
+        videoG = ofToString(getG);
+        videoB = ofToString(getB);
+
+        double getRythm = xmlHandler.getValue("rythm", -1.0);
+        videoRythm = ofToString(getRythm);
+
+        string edgesStr = "";
+        // read edge histogram into string
+        xmlHandler.pushTag("edgeHistogram");
+        int numberOfEdgeTypes = xmlHandler.getNumTags("edge");
+        for (int i = 0; i < numberOfEdgeTypes; ++i) {
+            edgesStr += ofToString(xmlHandler.getValue("edge", -1.0, i), 3);
+            if (i < numberOfEdgeTypes-1)
+                edgesStr += " | ";
+        }
+        xmlHandler.popTag();
+        edgeHist = edgesStr;
+
+        string texStr = "";
+        // read texture moments into string
+        xmlHandler.pushTag("textureMoments");
+        int numberOfTextureMoments = xmlHandler.getNumTags("tex");
+        for (int i = 0; i < numberOfTextureMoments; ++i) {
+            texStr += ofToString(xmlHandler.getValue("tex", -1.0, i), 3);
+            if (i < numberOfTextureMoments-1)
+                texStr += " | ";
+
+            if (i % 8 == 7) // :)
+                texStr += "\n";
+        }
+        xmlHandler.popTag();
+        texMomentsString = texStr;
+
+//        ofSetColor(225);
+//        verdana14.drawString(texStr, 200, 200);
+        ofLog(OF_LOG_NOTICE, texStr);
+//        texMoments = texStr;
+
+    }
+}
+
 
 void GuiApp::downButtonPressed() {
     if (thumbnailIdxOffset + 3 < (int)thumbnails.size()) {

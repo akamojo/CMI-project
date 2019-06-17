@@ -27,7 +27,7 @@ public:
 
 	ofxPanel nav;
 	ofxPanel details;
-    const float detailsWidth = 400.0, detailsHeight = 400.0;
+    float detailsWidth = 400.0, detailsHeight = 400.0;
 
     ofxPanel startScreenNav;
     ofxButton startButton;
@@ -44,6 +44,9 @@ public:
 	ofxLabel videoB;
 	ofxLabel videoRythm;
     ofxLabel edgeHist;
+
+    ofxLabel texMoments;
+    string texMomentsString = "";
 
 	ofxButton playButton;
 	ofxButton pauseButton;
@@ -89,8 +92,10 @@ public:
 
     void exit();
     void updateXML(int videoIdx, string tag, double value);
+
 private:
     void setupVidGrabber();
     void checkVidGrabberDevices();
+    void readXML(string videoXMLPath);
 };
 

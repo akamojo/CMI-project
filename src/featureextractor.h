@@ -21,10 +21,10 @@ public:
 	vector<double> getAvgColors();
 	double getRythm();
     vector<double> getEdgeDistribution();
-
-    void calculate();
-
     std::string getVideoResolution();
+    vector<double> getTextureMoments();
+
+    void calculate();    
 private:
     vector<double> calculateFrame();
     double calculateDiffBetweenFrames(ofxCvGrayscaleImage grayImg);
@@ -74,6 +74,7 @@ private:
     // Texture features variables
     const double sigmas[4] = {3.0, 4.0, 5.0, 6.0};
     const double thetas[7] = {22.5, 45.0, 67.5, 90.0, 123.75, 157.5, 180.0};
+    vector<double> textureMoments;
 
 };
 
