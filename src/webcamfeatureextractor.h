@@ -27,7 +27,9 @@ private:
 	double rythm = 0.0;
 	double rythmThreshold = 200;
 
-	ofxCvHaarFinder webCamPreviewFaceFinder;
+	ofxCvHaarFinder webcamFaceFinder;
+	int faceAreaThreshold = 5000;
+
 };
 
 #endif // WEBCAMFEATUREEXTRACTOR_H
