@@ -72,7 +72,7 @@ void GuiApp::setup(){
     // START SCREEN
 
     checkVidGrabberDevices();
-	webcamFeatureExtractor.setup();
+	webcamFeatureExtractor.setup("haarcascade_frontalface_default.xml");
     setupVidGrabber();
     ofBackground(0);
 
