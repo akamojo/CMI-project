@@ -26,6 +26,7 @@ private:
 
     void updateXML(string path, string tag, double value, double missingValue);
     void updateXMLWithVector(string path, string tag, string subTag, vector<double> values, double missingValue);
+    void updateXML(string path, string tag, string value, string missingValue);
 };
 
 #endif // VIDEOBACKGROUNDWORKER_H

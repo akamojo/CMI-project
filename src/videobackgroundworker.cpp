@@ -43,6 +43,33 @@ void VideoBackgroundWorker::updateXML(string path, string tag, double value, dou
     }
 }
 
+void VideoBackgroundWorker::updateXML(string path, string tag, string value, string missingValue) {
+
+    string xmlFilePath = ofSplitString(path, ".")[0] + ".xml";
+    if (xmlHandler.loadFile(xmlFilePath)) {
+
+        xmlHandler.pushTag("metadata");
+
+        string getCurrentValue = xmlHandler.getValue(tag, missingValue);
+        if (getCurrentValue == missingValue) {
+            xmlHandler.setValue(tag, value);
+            ofLog(OF_LOG_WARNING, "Replaced missing tag " + tag + " ...");
+        }
+        else if (getCurrentValue != missingValue) {
+            ofLog(OF_LOG_WARNING, "Tag " + tag + " to update is already set ");
+        }
+        else {
+            xmlHandler.addValue(tag, value);
+            ofLog(OF_LOG_NOTICE, "Writing " + ofToString(value) + " tag ");
+        }
+
+        xmlHandler.popTag();
+        xmlHandler.saveFile(xmlFilePath);
+
+        xmlHandler.clear();
+    }
+}
+
 void VideoBackgroundWorker::updateXMLWithVector(string path, string tag, string subTag, vector<double> values, double missingValue) {
     string xmlFilePath = ofSplitString(path, ".")[0] + ".xml";
     if (xmlHandler.loadFile(xmlFilePath)) {
@@ -103,6 +130,10 @@ void VideoBackgroundWorker::threadedFunction()
 
                 extractor.setup(videoName);
                 extractor.calculate();
+
+                std::string resolution = extractor.getVideoResolution();
+                updateXML(videoName, "resolution", resolution, "?");
+                ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with " + resolution);
 
                 getLumi = extractor.getLuminance();
                 updateXML(videoName, "luminance", getLumi, -1.0);

@@ -24,11 +24,13 @@ public:
 
     void calculate();
 
+    std::string getVideoResolution();
 private:
     vector<double> calculateFrame();
     double calculateDiffBetweenFrames(ofxCvGrayscaleImage grayImg);
     vector<double> calculateEdgeDistribution(ofxCvGrayscaleImage grayImg);
     vector<double> avgEdgeDistribution(vector<vector<double>> framesHistograms);
+    vector<double> calculateTextures(ofxCvGrayscaleImage grayImg);
 
     void convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight);
     vector <double> calculatePixel(ofPixels, int i, int j, int vidWidth, int nChannels);
@@ -54,6 +56,7 @@ private:
 
     std::string videoFilePath = "?";
     std::string tempFilename = "videos/temp/temp.mp4";
+    std::string resolutionStr = "?";
     ofVideoPlayer videoPlayer;
 
     // Edge Distribution variables
@@ -68,7 +71,7 @@ private:
     const double threshold_value = 0.0;
     const double max_binary_value = 255.0;
 
-    vector<double> calculateTextures(ofxCvGrayscaleImage grayImg);
+    // Texture features variables
     const double sigmas[4] = {3.0, 4.0, 5.0, 6.0};
     const double thetas[7] = {22.5, 45.0, 67.5, 90.0, 123.75, 157.5, 180.0};
 

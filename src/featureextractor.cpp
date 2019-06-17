@@ -44,6 +44,10 @@ vector<double> FeatureExtractor::getEdgeDistribution()
     return edgesHistogram;
 }
 
+std::string FeatureExtractor::getVideoResolution() {
+    return resolutionStr;
+}
+
 void FeatureExtractor::calculate() {
 
     if (videoFilePath == "?") return;
@@ -83,6 +87,8 @@ void FeatureExtractor::calculate() {
                 grayImg = colorImg;
 
                 if (frameCounter == 0) {
+                    // first frame
+                    resolutionStr = ofToString(videoPlayer.getWidth()) + " x " + ofToString(videoPlayer.getHeight());
                     this->calculateTextures(grayImg);
                 }
 
@@ -132,7 +138,6 @@ vector<double> FeatureExtractor::calculateTextures(ofxCvGrayscaleImage grayImg) 
             gaborKernel = cv::getGaborKernel(cv::Size(3, 3), sigmas[i], thetas[j], 10.0, 0.5);
             cv::filter2D(src, dst, -1, gaborKernel);
             cv::meanStdDev(dst, m, stdv);
-            cerr << "GABOR " << m << " " << stdv << endl;
         }
     }
 
@@ -142,6 +147,8 @@ vector<double> FeatureExtractor::calculateTextures(ofxCvGrayscaleImage grayImg) 
 vector<double> FeatureExtractor::avgEdgeDistribution(vector<vector<double>> framesHistograms) {
 
     vector<double> result(framesHistograms[0].size(), 0.0);
+
+
     // for each frame
     for (size_t i = 0; i < framesHistograms.size(); ++i) {
         // for each edge type
@@ -151,8 +158,7 @@ vector<double> FeatureExtractor::avgEdgeDistribution(vector<vector<double>> fram
     }
 
     for (size_t i = 0; i < result.size(); ++i) {
-        result[i] /= (double) result.size();
-        ofLog(OF_LOG_NOTICE, "[E d g e s] " + ofToString(result[i]));
+        result[i] /= (double) framesHistograms.size();
     }
 
     return result;
@@ -205,7 +211,7 @@ vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage g
     cv::Mat blurred, edges, binarized, kernel;
 
     // blur
-    GaussianBlur(src, blurred, cv::Size(3, 3), 0);
+    GaussianBlur(src, blurred, cv::Size(5, 5), 0);
 
     vector<double> result;
     double edges_ratio;
@@ -217,7 +223,9 @@ vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage g
         cv::filter2D(blurred, edges, CV_32F, kernel); // ? CV_32F - > -1?
         cv::threshold(edges, binarized, threshold_value, max_binary_value, cv::THRESH_BINARY);
 
-        edges_ratio = (double)cv::countNonZero(binarized) / (double)(edges.rows * edges.cols);
+        cv::Size s = binarized.size();
+        edges_ratio = (double)cv::countNonZero(binarized) / (double)(s.height * s.width);
+
         result.push_back(edges_ratio);
     }
 

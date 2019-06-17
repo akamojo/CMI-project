@@ -36,6 +36,8 @@ public:
 	ofxLabel rythmOfCaptured;
 
     ofxLabel videoName;
+    ofxLabel videoResolution;
+
     ofxLabel videoLuminance;
 	ofxLabel videoR;
 	ofxLabel videoG;
