@@ -111,12 +111,13 @@ void FeatureExtractor::calculate() {
                 colorImg.setFromPixels(videoPlayer.getPixels());
                 grayImg = colorImg;
 
-                Mat grayCvSmall, grayCv = toCv(grayImg.getPixels());
+                Mat grayCvSmall, grayCvForKeypoints, grayCv = toCv(grayImg.getPixels());
 
-                int destWidth = 200;
+                int destWidth = 300;
                 double ratio = (double) destWidth / (double) grayCv.cols;
 
                 resize(grayCv, grayCvSmall, cv::Size(), ratio, ratio);
+                resize(grayCv, grayCvForKeypoints, cv::Size(), ratio*2, ratio*2);
 
                 if (frameCounter == 0) {
                     // first frame
@@ -137,11 +138,11 @@ void FeatureExtractor::calculate() {
 					avgColors[i] += currentColors[i];
 				}
 
-//                vector<size_t> objects = keypointsMatcher.countObjects(grayImg);
-//                for (size_t i = 0; i < objects.size(); ++i) {
-//                    if (objects[i] > 0)
-//                        objectsCount[i] += 1.0;
-//                }
+                vector<size_t> objects = keypointsMatcher.countObjects(grayCvForKeypoints);
+                for (size_t i = 0; i < objects.size(); ++i) {
+                    if (objects[i] > 0)
+                        objectsCount[i] += 1.0;
+                }
 
             }
             this->frameCounter++;
