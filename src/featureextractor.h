@@ -76,7 +76,7 @@ private:
         {0.0f, 1.41f, -1.41f, 0.0f},
         {2, -2, -2, 2}
     };
-    const double threshold_value = 15.0;
+    const double threshold_value = 127.0;
     const double max_binary_value = 255.0;
 
     // Texture features variables

@@ -241,8 +241,6 @@ vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage g
     Mat src = toCv(grayImg.getPixels());
     Mat blurred, edges, binarized, kernel;
 
-//    Mat resized;
-//    resize(src, resized, cv::Size(500, 500));
     int destWidth = 500;
     double ratio = (double) destWidth / (double) src.cols;
 
@@ -260,8 +258,6 @@ vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage g
         kernel = Mat(2, 2, CV_32F, kernels[i]);
 
         filter2D(blurred, edges, CV_32F, kernel); // ? CV_32F - > -1?
-        imshow("hehe", edges);
-
         threshold(edges, binarized, threshold_value, max_binary_value, THRESH_BINARY);
 
         Size s = binarized.size();
