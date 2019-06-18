@@ -70,7 +70,7 @@ public:
 	int currentVideo = 0;
 
     WebCamPreview webCamPreview;
-    bool startScreenMode = false;
+    bool startScreenMode = true;
 	WebcamFeatureExtractor webcamFeatureExtractor;
 	vector<ofxCvBlob> faces;
 

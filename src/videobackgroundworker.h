@@ -13,7 +13,6 @@ public:
     VideoBackgroundWorker();
     void setup(ofDirectory dir);
     bool isWorking();
-
 protected:
     void threadedFunction();
 
