@@ -39,9 +39,7 @@ public:
     ofxLabel videoResolution;
 
     ofxLabel videoLuminance;
-	ofxLabel videoR;
-	ofxLabel videoG;
-	ofxLabel videoB;
+    ofxLabel videoColors;
 	ofxLabel videoRythm;
     ofxLabel edgeHist;
 

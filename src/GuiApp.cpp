@@ -151,9 +151,7 @@ void GuiApp::setup(){
 
     // VIDEO FEATURES
     details.add(videoLuminance.setup("lumi", "", detailsWidth));
-    details.add(videoR.setup("red", "", detailsWidth));
-    details.add(videoG.setup("green", "", detailsWidth));
-    details.add(videoB.setup("blue", "", detailsWidth));
+    details.add(videoColors.setup("colors", "", detailsWidth));
     details.add(videoRythm.setup("rythm", "", detailsWidth));
     details.add(edgeHist.setup("edge hist", "", detailsWidth));
 
@@ -277,9 +275,7 @@ void GuiApp::readXML(string videoXMLPath) {
         double getG = xmlHandler.getValue("green", -1.0);
         double getB = xmlHandler.getValue("blue", -1.0);
 
-        videoR = ofToString(getR);
-        videoG = ofToString(getG);
-        videoB = ofToString(getB);
+        videoColors = "R " + ofToString(getR, 1) + " | G " + ofToString(getG, 1) + " | B " + ofToString(getB, 1);
 
         double getRythm = xmlHandler.getValue("rythm", -1.0);
         videoRythm = ofToString(getRythm);
@@ -308,11 +304,12 @@ void GuiApp::readXML(string videoXMLPath) {
             else
                 texStr += ofToString(tex, 2);
 
-            if (i < numberOfTextureMoments-1)
-                texStr += " | ";
-
             if (i % 8 == 7) // :)
                 texStr += "\n";
+            else if (i < numberOfTextureMoments-1)
+                texStr += " | ";
+
+
         }
         xmlHandler.popTag();
         texMomentsString = texStr;

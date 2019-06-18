@@ -57,7 +57,11 @@ vector<string> KeypointsMatcher::getObjectsNames() {
 }
 
 vector<size_t> KeypointsMatcher::countObjects(ofxCvGrayscaleImage &grayImg, int goodMatchCoeff) {
-    Mat scene = toCv(grayImg.getPixels());
+    Mat originalScene = toCv(grayImg.getPixels());
+
+    Mat scene;
+    resize(originalScene, scene, cv::Size(), 0.5, 0.5);
+
     vector<size_t> result;
 
     std::vector<KeyPoint> keypoints_scene;
