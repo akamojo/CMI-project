@@ -1,8 +1,7 @@
 #include "featureextractor.h"
 
 FeatureExtractor::FeatureExtractor() {
-
-
+    keypointsMatcher.analyzeObjects("objects/");
 }
 
 void FeatureExtractor::setup(std::string path)
@@ -24,7 +23,10 @@ void FeatureExtractor::setup(std::string path)
     ofFile fileToRead(path);
     fileToRead.copyTo(tempFilename, true, true);
 
-    keypointsMatcher.analyzeObjects("objects/");
+    this->objectsCount.clear();
+    for (int i = 0; i < keypointsMatcher.getObjectsCount(); ++i)
+        objectsCount.push_back(0);
+
 }
 
 
@@ -56,6 +58,14 @@ vector<double> FeatureExtractor::getTextureMoments() {
     return textureMoments;
 }
 
+vector<double> FeatureExtractor::getObjectsCount() {
+    return objectsCount;
+}
+
+vector<string> FeatureExtractor::getObjectsNames() {
+    return keypointsMatcher.getObjectsNames();
+}
+
 void FeatureExtractor::calculate() {
 
     if (videoFilePath == "?") return;
@@ -66,7 +76,12 @@ void FeatureExtractor::calculate() {
     videoPlayer.play();
 
     skipStep = int( sqrt(((videoPlayer.getWidth() * videoPlayer.getHeight()) / (float) samplesPerFrame)) );
-    frameStep = int( videoPlayer.getTotalNumFrames() / framesPerVideo );
+
+    if (framesPerVideo > videoPlayer.getTotalNumFrames())
+        frameStep = 1;
+    else
+        frameStep = int( videoPlayer.getTotalNumFrames() / framesPerVideo );
+
 
     ofLog(OF_LOG_NOTICE, "[FeatureExtractor] starts for " + videoFilePath + "...");
 
@@ -110,12 +125,11 @@ void FeatureExtractor::calculate() {
 					avgColors[i] += currentColors[i];
 				}
 
-                cout << "[KEYPOINTS]" << " " << videoFilePath << endl;
-                vector<size_t> objects = keypointsMatcher.countObjects(grayImg);
-                for (int i = 0; i < objects.size(); ++i) {
-                    cout << i << ". : " << objects[i] << endl;
-                }
-
+//                vector<size_t> objects = keypointsMatcher.countObjects(grayImg);
+//                for (size_t i = 0; i < objects.size(); ++i) {
+//                    if (objects[i] > 0)
+//                        objectsCount[i] += 1.0;
+//                }
 
             }
             this->frameCounter++;
@@ -134,6 +148,9 @@ void FeatureExtractor::calculate() {
 
     edgesHistogram = this->avgEdgeDistribution(framesEdgeHistograms);
 
+    for (size_t i = 0; i < objectsCount.size(); ++i)
+        objectsCount[i] /= (double)(frameCounter / frameStep);
+
     videoPlayer.close();    
 }
 
@@ -147,8 +164,9 @@ vector<double> FeatureExtractor::calculateTextures(ofxCvGrayscaleImage grayImg) 
 
     for (int i = 0; i < sizeof(sigmas)/sizeof(double); ++i) {
         for (int j = 0; j < sizeof(thetas)/sizeof(double); ++j) {
+
             gaborKernel = getGaborKernel(Size(3, 3), sigmas[i], thetas[j], 10.0, 0.5);
-            filter2D(src, dst, -1, gaborKernel);
+            filter2D(src, dst, CV_32F, gaborKernel);
             meanStdDev(dst, m, stdv);
             result.push_back(m.at<double>(0));
             result.push_back(stdv.at<double>(0));
@@ -161,7 +179,6 @@ vector<double> FeatureExtractor::calculateTextures(ofxCvGrayscaleImage grayImg) 
 vector<double> FeatureExtractor::avgEdgeDistribution(vector<vector<double>> framesHistograms) {
 
     vector<double> result(framesHistograms[0].size(), 0.0);
-
 
     // for each frame
     for (size_t i = 0; i < framesHistograms.size(); ++i) {
@@ -224,8 +241,16 @@ vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage g
     Mat src = toCv(grayImg.getPixels());
     Mat blurred, edges, binarized, kernel;
 
+//    Mat resized;
+//    resize(src, resized, cv::Size(500, 500));
+    int destWidth = 500;
+    double ratio = (double) destWidth / (double) src.cols;
+
+    Mat resized;
+    resize(src, resized, cv::Size(), ratio, ratio);
+
     // blur
-    GaussianBlur(src, blurred, Size(5, 5), 0);
+    GaussianBlur(resized, blurred, Size(3, 3), 0);
 
     vector<double> result;
     double edges_ratio;
@@ -235,6 +260,8 @@ vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage g
         kernel = Mat(2, 2, CV_32F, kernels[i]);
 
         filter2D(blurred, edges, CV_32F, kernel); // ? CV_32F - > -1?
+        imshow("hehe", edges);
+
         threshold(edges, binarized, threshold_value, max_binary_value, THRESH_BINARY);
 
         Size s = binarized.size();

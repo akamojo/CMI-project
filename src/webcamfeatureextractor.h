@@ -34,7 +34,7 @@ private:
 	const int samplesPerFrame = 250;
 
 	int frameCounter;
-	int frameStep = 7;		// co 7 frame'ów
+	int frameStep = 7;		// co 7 frame
 
 	CvHistogram* prevHist = NULL;
 

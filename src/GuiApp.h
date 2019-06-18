@@ -44,20 +44,20 @@ public:
     ofxLabel videoResolution;
 
     ofxLabel videoLuminance;
-	ofxLabel videoR;
-	ofxLabel videoG;
-	ofxLabel videoB;
+    ofxLabel videoColors;
 	ofxLabel videoRythm;
     ofxLabel edgeHist;
 
     ofxLabel texMoments;
     string texMomentsString = "";
+    string objDetectedString = "";
 
 	ofxButton playButton;
 	ofxButton pauseButton;
 	ofxButton stopButton;
 
 	ofDirectory dir;
+    ofDirectory objDir;
 	vector<Thumbnail*> thumbnails;
 
     ofxXmlSettings xmlHandler;
@@ -102,6 +102,10 @@ private:
     void setupVidGrabber();
     void checkVidGrabberDevices();
     void readXML(string videoXMLPath);
-	vector<double> calculateDifferences();
+
+    vector<double> calculateDifferences();
+
+    void loadObjectNames(string dirPath);
+    void loadVideosNames(string dirPath);
 };
 
