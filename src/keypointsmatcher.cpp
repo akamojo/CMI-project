@@ -56,11 +56,7 @@ vector<string> KeypointsMatcher::getObjectsNames() {
     return objectsNames;
 }
 
-vector<size_t> KeypointsMatcher::countObjects(ofxCvGrayscaleImage &grayImg, int goodMatchCoeff) {
-    Mat originalScene = toCv(grayImg.getPixels());
-
-    Mat scene;
-    resize(originalScene, scene, cv::Size(), 0.5, 0.5);
+vector<size_t> KeypointsMatcher::countObjects(Mat scene) {
 
     vector<size_t> result;
 
@@ -91,12 +87,14 @@ vector<size_t> KeypointsMatcher::countObjects(ofxCvGrayscaleImage &grayImg, int 
 
         for (int i = 0; i < objectsDescriptors[i].rows; i++)
         {
+
 /*          if (matches[i].distance <= goodMatchCoeff * min_dist)
             {
                 good_matches.push_back(matches[i]);
                 cout << matches[i].distance << endl;
             }
 */
+
             if (matches[i].distance < this->maxAbsoluteDistance)
                 good_matches.push_back(matches[i]);
         }
