@@ -9,6 +9,8 @@
 #include "ofxCvColorImage.h"
 #include "ofxCvGrayscaleImage.h"
 
+#include "videoclassifier.h"
+
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -29,6 +31,7 @@ public:
     vector<double> getEdgeDistribution();
     string getVideoResolution();
     vector<double> getTextureMoments();
+	std::string getCategory();
 
     void calculate();
     vector<double> getObjectsCount();
@@ -57,6 +60,7 @@ private:
     const int framesPerVideo = 75;
 
 	CvHistogram* prevHist = NULL;
+	VideoClassifier classifier;
 
 	double rythm;
 	double rythmThreshold = 200;
@@ -64,9 +68,11 @@ private:
 	vector<double> avgColors;
     vector<double> edgesHistogram;
 
+	string category;
     string videoFilePath = "?";
     string tempFilename = "videos/temp/temp.mp4";
     string resolutionStr = "?";
+
     ofVideoPlayer videoPlayer;
 
     // Edge Distribution variables

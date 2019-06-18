@@ -32,6 +32,7 @@ void GuiApp::createMetadatasFiles() {
 
             xmlHandler.addValue("name", ofSplitString(dir.getName(i), ".")[0]);
             xmlHandler.addValue("resolution", "?");
+			xmlHandler.addValue("category", "?");
 
             xmlHandler.addValue("luminance", -1.0);
             xmlHandler.addValue("red", -1.0);
@@ -143,6 +144,7 @@ void GuiApp::setup(){
     // VIDEO BASIC INFO
     details.add(videoName.setup("file", "", detailsWidth));
     details.add(videoResolution.setup("size", "", detailsWidth));
+	details.add(videoCategory.setup("category", "", detailsWidth));
 
     // VIDEO NAVIGATION
     details.add(playButton.setup("play", detailsWidth));
@@ -287,6 +289,7 @@ void GuiApp::readXML(string videoXMLPath) {
         xmlHandler.pushTag("metadata");
         videoName = xmlHandler.getValue("name", "?");
         videoResolution = xmlHandler.getValue("resolution", "?");
+		videoCategory = xmlHandler.getValue("category", "?");
 
         double getLumi = xmlHandler.getValue("luminance", -1.0);
         videoLuminance = ofToString(getLumi);

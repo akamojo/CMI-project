@@ -42,6 +42,7 @@ public:
 
     ofxLabel videoName;
     ofxLabel videoResolution;
+	ofxLabel videoCategory;
 
     ofxLabel videoLuminance;
     ofxLabel videoColors;
