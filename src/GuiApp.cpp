@@ -165,6 +165,7 @@ void GuiApp::setup(){
     details.add(videoColors.setup("colors", "", detailsWidth));
     details.add(videoRythm.setup("rythm", "", detailsWidth));
     details.add(edgeHist.setup("edge hist", "", detailsWidth));
+    details.add(videoBestMatch.setup("best match", "", detailsWidth));
 
     // BUTTONS
     startButton.addListener(this, &GuiApp::startButtonPressed);
@@ -253,7 +254,7 @@ void GuiApp::draw(){
         int mainPlayerY = 20;
 
         ofDrawBitmapStringHighlight(texMomentsString, details.getPosition().x, details.getPosition().y + details.getHeight() + 20.0);
-        ofDrawBitmapStringHighlight(objDetectedString, mainPlayerX + mainPlayerWidth + 20, mainPlayerY + 20);
+//        ofDrawBitmapStringHighlight(objDetectedString, mainPlayerX + mainPlayerWidth + 20, mainPlayerY + 20);
 
         if (dir.size() > 0) {
             ofSetColor(ofColor::white);
@@ -347,21 +348,32 @@ void GuiApp::readXML(string videoXMLPath) {
         xmlHandler.popTag();
         texMomentsString = texStr;
 
-        string objStr = "detected objects:\n\n";
+        string objStr = "best match:\n\n";
         xmlHandler.pushTag("detectedObjects");
         int numberOfObjects = xmlHandler.getNumTags("object");
+
+        double bestScore = 0.0;
+        string bestName = "";
+
         for (int i = 0; i < numberOfTextureMoments; ++i) {
 
             double tex = xmlHandler.getValue("object", -1.0, i);
             if (tex <= 0.0)
                 continue;
 
-            objStr += objDir.getName(i) + " : ";
-            objStr += ofToString(tex, 3) + "\n";
-
+            if (tex > bestScore) {
+                bestScore = tex;
+                bestName = objDir.getName(i);
+            }
         }
+        objStr = "";
+        objStr += bestName + " ( ";
+        objStr += ofToString(bestScore, 3) + " )";
+
         xmlHandler.popTag();
         objDetectedString = objStr;
+
+        videoBestMatch = objStr;
 
     }
 }
@@ -528,6 +540,7 @@ void GuiApp::keyPressed(int key) {
 }
 
 void GuiApp::exit() {
+
     if (worker.isThreadRunning())
         worker.stopThread();
 
