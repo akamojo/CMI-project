@@ -26,6 +26,8 @@ public:
     int getObjectsCount();
     vector<string> getObjectsNames();
     vector<size_t> countObjects(Mat scene);
+    vector<double> getBestMatch(Mat scene);
+
 private:
 
     ofDirectory dir;

@@ -335,7 +335,7 @@ void GuiApp::readXML(string videoXMLPath) {
         xmlHandler.popTag();
         texMomentsString = texStr;
 
-        string objStr = "detected objects:\n";
+        string objStr = "detected objects:\n\n";
         xmlHandler.pushTag("detectedObjects");
         int numberOfObjects = xmlHandler.getNumTags("object");
         for (int i = 0; i < numberOfTextureMoments; ++i) {

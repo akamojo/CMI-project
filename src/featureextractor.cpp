@@ -112,7 +112,6 @@ void FeatureExtractor::calculate() {
                 double ratio = (double) destWidth / (double) grayCv.cols;
 
                 resize(grayCv, grayCvSmall, cv::Size(), ratio, ratio);
-                resize(grayCv, grayCvForKeypoints, cv::Size(), ratio*2, ratio*2);
 
                 if (frameCounter == 0) {
                     // first frame
@@ -133,11 +132,29 @@ void FeatureExtractor::calculate() {
 					avgColors[i] += currentColors[i];
 				}
 
-                vector<size_t> objects = keypointsMatcher.countObjects(grayCvForKeypoints);
-                for (size_t i = 0; i < objects.size(); ++i) {
-                    if (objects[i] > 0)
-                        objectsCount[i] += 1.0;
+                int best_match = -1;
+                double best_distance = 1000000.0;
+
+                for (int x = 1; x <= 7; x+=3) {
+                    resize(grayCv, grayCvForKeypoints, cv::Size(), ratio*x, ratio*x);
+
+//                    objects = keypointsMatcher.countObjects(grayCvForKeypoints);
+
+                    vector<double> currentMatch = keypointsMatcher.getBestMatch(grayCvForKeypoints);
+                    if (currentMatch[0] == -1.0) continue;
+
+                    if (currentMatch[1] < best_distance) {
+                        best_distance = currentMatch[1];
+                        best_match = currentMatch[0];
+                    }
+
+//                    for (size_t i = 0; i < objects.size(); ++i) {
+//                        if (objects[i] > 0)
+//                            objectsCount[i] += 1.0;
+//                    }
+
                 }
+                objectsCount[best_match] += 1;
 
             }
             this->frameCounter++;
