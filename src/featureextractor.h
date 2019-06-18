@@ -33,12 +33,14 @@ public:
     void calculate();
     vector<double> getObjectsCount();
     vector<string> getObjectsNames();
+
 private:
     vector<double> calculateFrame();
     double calculateDiffBetweenFrames(ofxCvGrayscaleImage grayImg);
-    vector<double> calculateEdgeDistribution(ofxCvGrayscaleImage grayImg);
     vector<double> avgEdgeDistribution(vector<vector<double>> framesHistograms);
-    vector<double> calculateTextures(ofxCvGrayscaleImage grayImg);
+
+    vector<double> calculateEdgeDistribution(Mat src);
+    vector<double> calculateTextures(Mat src);
 
     void convertPixels(ofPixels &inPixels, ofPixels &newPixels, int vidWidth, int vidHeight);
     vector <double> calculatePixel(ofPixels, int i, int j, int vidWidth, int nChannels);
@@ -76,7 +78,7 @@ private:
         {0.0f, 1.41f, -1.41f, 0.0f},
         {2, -2, -2, 2}
     };
-    const double threshold_value = 127.0;
+    const double threshold_value = 1.0;
     const double max_binary_value = 255.0;
 
     // Texture features variables
@@ -87,6 +89,7 @@ private:
     // Keypoints
     KeypointsMatcher keypointsMatcher;
     vector<double> objectsCount;
+
 };
 
 #endif // FEATUREEXTRACTOR_H

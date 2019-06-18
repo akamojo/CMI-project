@@ -106,10 +106,17 @@ void FeatureExtractor::calculate() {
                 colorImg.setFromPixels(videoPlayer.getPixels());
                 grayImg = colorImg;
 
+                Mat grayCvSmall, grayCv = toCv(grayImg.getPixels());
+
+                int destWidth = 200;
+                double ratio = (double) destWidth / (double) grayCv.cols;
+
+                resize(grayCv, grayCvSmall, cv::Size(), ratio, ratio);
+
                 if (frameCounter == 0) {
                     // first frame
                     resolutionStr = ofToString(videoPlayer.getWidth()) + " x " + ofToString(videoPlayer.getHeight());
-                    textureMoments = this->calculateTextures(grayImg);
+                    textureMoments = this->calculateTextures(grayCvSmall);
                 }
 
                 currentColors = this->calculateFrame();
@@ -118,7 +125,7 @@ void FeatureExtractor::calculate() {
 				diff = this->calculateDiffBetweenFrames(grayImg);
 				rythm += 1 - diff / (double) 255.0;
 
-                vector<double> currentEdgeDistribution = this->calculateEdgeDistribution(grayImg);
+                vector<double> currentEdgeDistribution = this->calculateEdgeDistribution(grayCvSmall);
                 framesEdgeHistograms.push_back(currentEdgeDistribution);
 
 				for (int i = 0; i < 3; i++) {
@@ -154,9 +161,8 @@ void FeatureExtractor::calculate() {
     videoPlayer.close();    
 }
 
-vector<double> FeatureExtractor::calculateTextures(ofxCvGrayscaleImage grayImg) {
+vector<double> FeatureExtractor::calculateTextures(Mat src) {
     // to openCV
-    Mat src = toCv(grayImg.getPixels());
     Mat gaborKernel, dst;
 
     vector<double> result;
@@ -170,6 +176,7 @@ vector<double> FeatureExtractor::calculateTextures(ofxCvGrayscaleImage grayImg) 
             meanStdDev(dst, m, stdv);
             result.push_back(m.at<double>(0));
             result.push_back(stdv.at<double>(0));
+
         }
     }
 
@@ -235,20 +242,13 @@ vector<double> FeatureExtractor::calculateFrame() {
     return vresult;
 }
 
-vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage grayImg) {
+vector<double> FeatureExtractor::calculateEdgeDistribution(Mat src) {
 
     // to openCV
-    Mat src = toCv(grayImg.getPixels());
     Mat blurred, edges, binarized, kernel;
 
-    int destWidth = 500;
-    double ratio = (double) destWidth / (double) src.cols;
-
-    Mat resized;
-    resize(src, resized, cv::Size(), ratio, ratio);
-
     // blur
-    GaussianBlur(resized, blurred, Size(3, 3), 0);
+    GaussianBlur(src, blurred, Size(3, 3), 0);
 
     vector<double> result;
     double edges_ratio;

@@ -312,14 +312,15 @@ void GuiApp::readXML(string videoXMLPath) {
         xmlHandler.popTag();
         edgeHist = edgesStr;
 
-        string texStr = "texture moments:\n";
+        string texStr = "texture moments:\n\n";
         // read texture moments into string
         xmlHandler.pushTag("textureMoments");
         int numberOfTextureMoments = xmlHandler.getNumTags("tex");
         for (int i = 0; i < numberOfTextureMoments; ++i) {
 
             double tex = xmlHandler.getValue("tex", -1.0, i);
-            if (tex / 10.0 < 1.0)
+
+            if (tex / 10.0 < 1.0 && tex >= 0.0)
                 texStr += ofToString(tex, 3);
             else
                 texStr += ofToString(tex, 2);
