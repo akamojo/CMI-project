@@ -32,6 +32,7 @@ void GuiApp::createMetadatasFiles() {
 
             xmlHandler.addValue("name", ofSplitString(dir.getName(i), ".")[0]);
             xmlHandler.addValue("resolution", "?");
+			xmlHandler.addValue("category", "?");
 
             xmlHandler.addValue("luminance", -1.0);
             xmlHandler.addValue("red", -1.0);
@@ -135,6 +136,10 @@ void GuiApp::setup(){
 	pauseButton.addListener(this, &GuiApp::pauseButtonPressed);
 	stopButton.addListener(this, &GuiApp::stopButtonPressed);
 
+	categoryParty.addListener(this, &GuiApp::categoryPartySelected);
+	categoryCalm.addListener(this, &GuiApp::categoryCalmSelected);
+	categoryOther.addListener(this, &GuiApp::categoryOtherSelected);
+
 	details.setup();
 
     detailsWidth = mainPlayerWidth;
@@ -148,6 +153,12 @@ void GuiApp::setup(){
     details.add(playButton.setup("play", detailsWidth));
     details.add(pauseButton.setup("pause", detailsWidth));
     details.add(stopButton.setup("stop", detailsWidth));
+
+	// VIDEO CATEGORY
+	details.add(videoCategory.setup("Video category", "", detailsWidth));
+	details.add(categoryParty.setup("party", detailsWidth));
+	details.add(categoryCalm.setup("calm", detailsWidth));
+	details.add(categoryOther.setup("other", detailsWidth));
 
     // VIDEO FEATURES
     details.add(videoLuminance.setup("lumi", "", detailsWidth));
@@ -288,6 +299,7 @@ void GuiApp::readXML(string videoXMLPath) {
         xmlHandler.pushTag("metadata");
         videoName = xmlHandler.getValue("name", "?");
         videoResolution = xmlHandler.getValue("resolution", "?");
+		videoCategory = xmlHandler.getValue("category", "?");
 
         double getLumi = xmlHandler.getValue("luminance", -1.0);
         videoLuminance = ofToString(getLumi);
@@ -452,7 +464,7 @@ vector<double> GuiApp::calculateDifferences()
 				- ofToDouble(capturedLuminance)) / (double) 255.0;
 			diff += abs(xmlHandler.getValue("rythm", 10000.0) - ofToDouble(capturedRythm));
 
-			cout << dir.getPath(i) << " " << diff << endl;
+			//cout << dir.getPath(i) << " " << diff << endl;
 			differences.push_back(diff);
 		}
 	}
@@ -466,6 +478,51 @@ void GuiApp::manageButtonPressed()
 
     if (startScreenMode)
         startScreenMode = false;
+}
+
+void GuiApp::categoryCalmSelected()
+{
+	updateCategory(classifier.CategoryToString(CALM));
+}
+
+void GuiApp::categoryPartySelected()
+{
+	updateCategory(classifier.CategoryToString(PARTY));
+}
+
+void GuiApp::categoryOtherSelected()
+{
+	updateCategory(classifier.CategoryToString(OTHER));
+}
+
+void GuiApp::updateCategory(string cat)
+{
+	videoCategory = cat;
+
+	string xmlFilePath = ofSplitString(dir.getPath(currentVideo), ".")[0] + ".xml";
+	if (xmlHandler.loadFile(xmlFilePath)) {
+
+		xmlHandler.pushTag("metadata");
+
+		string getCurrentValue = xmlHandler.getValue("category", "?");
+		if (getCurrentValue == "?") {
+			xmlHandler.setValue("category", cat);
+			ofLog(OF_LOG_WARNING, "Replaced missing category...");
+		}
+		else if (getCurrentValue != "?") {
+			xmlHandler.setValue("category", cat);
+			ofLog(OF_LOG_WARNING, "Category has been updated ");
+		}
+		else {
+			xmlHandler.addValue("category", cat);
+			ofLog(OF_LOG_NOTICE, "Writing " + cat + " tag ");
+		}
+
+		xmlHandler.popTag();
+		xmlHandler.saveFile(xmlFilePath);
+
+		xmlHandler.clear();
+	}
 }
 
 void GuiApp::keyPressed(int key) {
@@ -493,4 +550,7 @@ void GuiApp::exit() {
 	pauseButton.removeListener(this, &GuiApp::pauseButtonPressed);
 	stopButton.removeListener(this, &GuiApp::stopButtonPressed);
 	addButton.removeListener(this, &GuiApp::addButtonPressed);
+	categoryParty.removeListener(this, &GuiApp::categoryPartySelected);
+	categoryCalm.removeListener(this, &GuiApp::categoryCalmSelected);
+	categoryOther.removeListener(this, &GuiApp::categoryOtherSelected);
 }

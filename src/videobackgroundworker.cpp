@@ -165,6 +165,8 @@ void VideoBackgroundWorker::threadedFunction()
             double getRed = xmlHandler.getValue("red", -1.0);
 			double getRythm = xmlHandler.getValue("rythm", -1.0);
 
+			string getCategory = xmlHandler.getValue("category", "?");
+
             if (getLumi == -1.0 || getRed == -1.0 || getRythm == -1.0) {
 
                 ofLog(OF_LOG_NOTICE, "[BG Worker] Calculating features ");
@@ -175,6 +177,10 @@ void VideoBackgroundWorker::threadedFunction()
                 std::string resolution = extractor.getVideoResolution();
                 updateXML(videoName, "resolution", resolution, "?");
                 ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with " + resolution);
+
+				getCategory = extractor.getCategory();
+				updateXML(videoName, "category", getCategory, "?");
+				ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with " + getCategory);
 
                 getLumi = extractor.getLuminance();
                 updateXML(videoName, "luminance", getLumi, -1.0);
@@ -208,5 +214,9 @@ void VideoBackgroundWorker::threadedFunction()
     }
 
     this->workFinished = true;
+<<<<<<< HEAD
 
+=======
+    cout << "GOODBYE!" << endl;
+>>>>>>> 307ff1cd1d75401f97718c59c4f03d2cfc989691
 }

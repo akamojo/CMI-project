@@ -7,6 +7,7 @@ FeatureExtractor::FeatureExtractor() {
 void FeatureExtractor::setup(std::string path)
 {
     this->videoFilePath = path;
+	this->category = "?";
     this->frameCounter = 0;
     this->luminance = -1.0;
 	this->prevHist = NULL;
@@ -63,7 +64,11 @@ vector<double> FeatureExtractor::getObjectsCount() {
 }
 
 vector<string> FeatureExtractor::getObjectsNames() {
-    return keypointsMatcher.getObjectsNames();
+	return keypointsMatcher.getObjectsNames();
+}
+
+std::string FeatureExtractor::getCategory() {
+	return category;
 }
 
 void FeatureExtractor::calculate() {
@@ -172,6 +177,7 @@ void FeatureExtractor::calculate() {
 	}
 
     edgesHistogram = this->avgEdgeDistribution(framesEdgeHistograms);
+	category = this->classifier.classify(luminance, rythm);
 
     for (size_t i = 0; i < objectsCount.size(); ++i)
         objectsCount[i] /= (double)(frameCounter / frameStep);
