@@ -22,7 +22,7 @@ class KeypointsMatcher {
 public:
     KeypointsMatcher();
     void analyzeObjects(string dirPath);
-    vector<size_t> countObjects(ofxCvGrayscaleImage &grayImg, int goodMatchCoeff = 2);
+    vector<size_t> countObjects(ofxCvGrayscaleImage &grayImg, int goodMatchCoeff = 1);
 private:
 
     ofDirectory dir;
@@ -34,6 +34,8 @@ private:
      vector<vector<KeyPoint>> objectsKeypoints;
      vector<Mat> objectsDescriptors;
      vector<string> objectsNames;
+
+     float maxAbsoluteDistance = 200.0;
 
      void detectObject(Mat &object, std::vector<KeyPoint> &keypoints_object, Mat &descriptors_object);
 };

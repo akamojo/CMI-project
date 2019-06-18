@@ -66,7 +66,12 @@ void FeatureExtractor::calculate() {
     videoPlayer.play();
 
     skipStep = int( sqrt(((videoPlayer.getWidth() * videoPlayer.getHeight()) / (float) samplesPerFrame)) );
-    frameStep = int( videoPlayer.getTotalNumFrames() / framesPerVideo );
+
+    if (framesPerVideo > videoPlayer.getTotalNumFrames())
+        frameStep = 1;
+    else
+        frameStep = int( videoPlayer.getTotalNumFrames() / framesPerVideo );
+
 
     ofLog(OF_LOG_NOTICE, "[FeatureExtractor] starts for " + videoFilePath + "...");
 
