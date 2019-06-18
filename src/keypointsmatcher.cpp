@@ -48,6 +48,14 @@ void KeypointsMatcher::detectObject(Mat &object, std::vector<KeyPoint> &keypoint
 
 }
 
+int KeypointsMatcher::getObjectsCount() {
+    return objectsNames.size();
+}
+
+vector<string> KeypointsMatcher::getObjectsNames() {
+    return objectsNames;
+}
+
 vector<size_t> KeypointsMatcher::countObjects(ofxCvGrayscaleImage &grayImg, int goodMatchCoeff) {
     Mat scene = toCv(grayImg.getPixels());
     vector<size_t> result;
@@ -56,12 +64,15 @@ vector<size_t> KeypointsMatcher::countObjects(ofxCvGrayscaleImage &grayImg, int 
     Mat descriptors_scene;
     detectObject(scene, keypoints_scene, descriptors_scene);
 
-    matcher = DescriptorMatcher::create("BruteForce");
+    BFMatcher matcher(NORM_L2);
+
+//    matcher.match()
+//    matcher = DescriptorMatcher::create("BruteForce");
+
     vector< DMatch > matches;
 
     for (int i = 0; i < objectsNames.size(); ++i) {
-        matcher->match(objectsDescriptors[i], descriptors_scene, matches);
-        cout << "object " << objectsNames[i] << ":" << endl;
+        matcher.match(objectsDescriptors[i], descriptors_scene, matches);
 
         double max_dist = 0.0; double min_dist = 1000000.0;
 
@@ -76,11 +87,12 @@ vector<size_t> KeypointsMatcher::countObjects(ofxCvGrayscaleImage &grayImg, int 
 
         for (int i = 0; i < objectsDescriptors[i].rows; i++)
         {
-//            if (matches[i].distance <= goodMatchCoeff * min_dist)
-//            {
-//                good_matches.push_back(matches[i]);
-//                cout << matches[i].distance << endl;
-//            }
+/*          if (matches[i].distance <= goodMatchCoeff * min_dist)
+            {
+                good_matches.push_back(matches[i]);
+                cout << matches[i].distance << endl;
+            }
+*/
             if (matches[i].distance < this->maxAbsoluteDistance)
                 good_matches.push_back(matches[i]);
         }

@@ -23,6 +23,9 @@ public:
     KeypointsMatcher();
     void analyzeObjects(string dirPath);
     vector<size_t> countObjects(ofxCvGrayscaleImage &grayImg, int goodMatchCoeff = 1);
+
+    int getObjectsCount();
+    vector<string> getObjectsNames();
 private:
 
     ofDirectory dir;

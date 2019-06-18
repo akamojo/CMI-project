@@ -49,6 +49,11 @@ void GuiApp::createMetadatasFiles() {
             xmlHandler.addValue("tex", -1.0);
             xmlHandler.popTag();
 
+            xmlHandler.addTag("detectedObjects");
+            xmlHandler.pushTag("detectedObjects");
+            xmlHandler.addValue("object", -1.0);
+            xmlHandler.popTag();
+
             xmlHandler.popTag();
             xmlHandler.saveFile(xmlFilePath);
 
@@ -77,6 +82,12 @@ void GuiApp::checkVidGrabberDevices() {
     }
 }
 
+void GuiApp::loadObjectNames(string dirPath) {
+    objDir.allowExt("png");
+    objDir.listDir(dirPath);
+    objDir.sort();
+}
+
 
 void GuiApp::setup(){
 	ofSetVerticalSync(true);
@@ -103,10 +114,8 @@ void GuiApp::setup(){
 
     ofBackground(255, 0, 144);
 
-    dir.allowExt("mov");
-    dir.allowExt("mp4");
-    dir.listDir("videos/");
-	dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
+    this->loadVideosNames("videos/");
+    this->loadObjectNames("objects/");
 
     createMetadatasFiles();
     worker.setup(dir);
@@ -165,6 +174,13 @@ void GuiApp::setup(){
 	ofSetVerticalSync(false);
 }
 
+void GuiApp::loadVideosNames(string dirPath) {
+    dir.allowExt("mov");
+    dir.allowExt("mp4");
+    dir.listDir(dirPath);
+    dir.sort(); // in linux the file system doesn't return file lists ordered in alphabetical order
+}
+
 void GuiApp::update(){
 
     if (startScreenMode) {
@@ -205,7 +221,12 @@ void GuiApp::draw(){
     else {
         nav.draw();
         details.draw();
-        ofDrawBitmapString(texMomentsString, details.getPosition().x, details.getPosition().y + details.getHeight() + 20.0);
+
+        int mainPlayerX = thumbnailsOffset + thumbnails[0]->thumbnailSize + 50;
+        int mainPlayerY = 20;
+
+        ofDrawBitmapStringHighlight(texMomentsString, details.getPosition().x, details.getPosition().y + details.getHeight() + 20.0);
+        ofDrawBitmapStringHighlight(objDetectedString, mainPlayerX + mainPlayerWidth + 20, mainPlayerY + 20);
 
         if (dir.size() > 0) {
             ofSetColor(ofColor::white);
@@ -218,7 +239,7 @@ void GuiApp::draw(){
                 }
             }
 
-            mainPlayer.draw(thumbnailsOffset + thumbnails[0]->thumbnailSize + 50, 20, mainPlayerWidth, mainPlayerHeight);
+            mainPlayer.draw(mainPlayerX, mainPlayerY, mainPlayerWidth, mainPlayerHeight);
         }
     }
 
@@ -296,9 +317,21 @@ void GuiApp::readXML(string videoXMLPath) {
         xmlHandler.popTag();
         texMomentsString = texStr;
 
-//        ofSetColor(225);
-//        verdana14.drawString(texStr, 200, 200);
-//        texMoments = texStr;
+        string objStr = "detected objects:\n";
+        xmlHandler.pushTag("detectedObjects");
+        int numberOfObjects = xmlHandler.getNumTags("object");
+        for (int i = 0; i < numberOfTextureMoments; ++i) {
+
+            double tex = xmlHandler.getValue("object", -1.0, i);
+            if (tex <= 0.0)
+                continue;
+
+            objStr += objDir.getName(i) + " : ";
+            objStr += ofToString(tex, 3) + "\n";
+
+        }
+        xmlHandler.popTag();
+        objDetectedString = objStr;
 
     }
 }

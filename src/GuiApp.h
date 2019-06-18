@@ -47,12 +47,14 @@ public:
 
     ofxLabel texMoments;
     string texMomentsString = "";
+    string objDetectedString = "";
 
 	ofxButton playButton;
 	ofxButton pauseButton;
 	ofxButton stopButton;
 
 	ofDirectory dir;
+    ofDirectory objDir;
 	vector<Thumbnail*> thumbnails;
 
     ofxXmlSettings xmlHandler;
@@ -97,5 +99,8 @@ private:
     void setupVidGrabber();
     void checkVidGrabberDevices();
     void readXML(string videoXMLPath);
+
+    void loadObjectNames(string dirPath);
+    void loadVideosNames(string dirPath);
 };
 

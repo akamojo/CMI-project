@@ -1,8 +1,7 @@
 #include "featureextractor.h"
 
 FeatureExtractor::FeatureExtractor() {
-
-
+    keypointsMatcher.analyzeObjects("objects/");
 }
 
 void FeatureExtractor::setup(std::string path)
@@ -24,7 +23,10 @@ void FeatureExtractor::setup(std::string path)
     ofFile fileToRead(path);
     fileToRead.copyTo(tempFilename, true, true);
 
-    keypointsMatcher.analyzeObjects("objects/");
+    this->objectsCount.clear();
+    for (int i = 0; i < keypointsMatcher.getObjectsCount(); ++i)
+        objectsCount.push_back(0);
+
 }
 
 
@@ -54,6 +56,14 @@ std::string FeatureExtractor::getVideoResolution() {
 
 vector<double> FeatureExtractor::getTextureMoments() {
     return textureMoments;
+}
+
+vector<double> FeatureExtractor::getObjectsCount() {
+    return objectsCount;
+}
+
+vector<string> FeatureExtractor::getObjectsNames() {
+    return keypointsMatcher.getObjectsNames();
 }
 
 void FeatureExtractor::calculate() {
@@ -114,12 +124,11 @@ void FeatureExtractor::calculate() {
 					avgColors[i] += currentColors[i];
 				}
 
-                cout << "[KEYPOINTS]" << " " << videoFilePath << endl;
                 vector<size_t> objects = keypointsMatcher.countObjects(grayImg);
-                for (int i = 0; i < objects.size(); ++i) {
-                    cout << i << ". : " << objects[i] << endl;
+                for (size_t i = 0; i < objects.size(); ++i) {
+                    if (objects[i] > 0)
+                        objectsCount[i] += 1.0;
                 }
-
 
             }
             this->frameCounter++;
@@ -137,6 +146,9 @@ void FeatureExtractor::calculate() {
 	}
 
     edgesHistogram = this->avgEdgeDistribution(framesEdgeHistograms);
+
+    for (size_t i = 0; i < objectsCount.size(); ++i)
+        objectsCount[i] /= (double)(frameCounter / frameStep);
 
     videoPlayer.close();    
 }

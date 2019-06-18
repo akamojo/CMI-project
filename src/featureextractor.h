@@ -30,7 +30,9 @@ public:
     string getVideoResolution();
     vector<double> getTextureMoments();
 
-    void calculate();    
+    void calculate();
+    vector<double> getObjectsCount();
+    vector<string> getObjectsNames();
 private:
     vector<double> calculateFrame();
     double calculateDiffBetweenFrames(ofxCvGrayscaleImage grayImg);
@@ -84,6 +86,7 @@ private:
 
     // Keypoints
     KeypointsMatcher keypointsMatcher;
+    vector<double> objectsCount;
 };
 
 #endif // FEATUREEXTRACTOR_H

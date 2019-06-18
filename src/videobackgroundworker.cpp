@@ -107,6 +107,43 @@ void VideoBackgroundWorker::updateXMLWithVector(string path, string tag, string 
     }
 }
 
+void VideoBackgroundWorker::updateXMLWithObjects(string path, string tag, string subTag, vector<double> objectsCounts, vector<string> objectsNames, double missingValue) {
+    string xmlFilePath = ofSplitString(path, ".")[0] + ".xml";
+    if (xmlHandler.loadFile(xmlFilePath)) {
+
+        xmlHandler.pushTag("metadata");
+
+        if (!xmlHandler.tagExists(tag)) {
+            xmlHandler.addTag(tag);
+        }
+        xmlHandler.pushTag(tag);
+
+        double getCurrentValue = xmlHandler.getValue(subTag, missingValue);
+        if (getCurrentValue == missingValue) {
+            for (size_t i = 0; i < objectsCounts.size(); ++i) {
+                xmlHandler.setValue(subTag, objectsCounts[i], i);
+            }
+        }
+        else if (getCurrentValue != missingValue) {
+            ofLog(OF_LOG_WARNING, "Tag " + tag + " to update is already set ");
+        }
+        else {
+            for (size_t i = 0; i < objectsCounts.size(); ++i) {
+                xmlHandler.addAttribute(tag, "name", objectsNames[i], i);
+                int tagNum = xmlHandler.addValue(tag, objectsCounts[i]);
+                ofLog(OF_LOG_NOTICE, "Writing " + ofToString(objectsCounts[i]) + " tag ");
+            }
+        }
+
+        xmlHandler.popTag();
+        xmlHandler.popTag();
+
+        xmlHandler.saveFile(xmlFilePath);
+
+        xmlHandler.clear();
+    }
+}
+
 void VideoBackgroundWorker::threadedFunction()
 {
     for (int i = 0; i < (int)videosDir.size(); i++) {
@@ -156,6 +193,10 @@ void VideoBackgroundWorker::threadedFunction()
                 vector<double> textureMoments = extractor.getTextureMoments();
                 updateXMLWithVector(videoName, "textureMoments", "tex", textureMoments, -1);
                 ofLog(OF_LOG_NOTICE, "[BG Worker] Updated XML with texture moments");
+
+                vector<double> objectsOccurences = extractor.getObjectsCount();
+                vector<string> objectsNames = extractor.getObjectsNames();
+                updateXMLWithObjects(videoName, "detectedObjects", "object", objectsOccurences, objectsNames, -1.0);
 
             }
 
