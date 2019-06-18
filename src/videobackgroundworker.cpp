@@ -5,10 +5,6 @@ VideoBackgroundWorker::VideoBackgroundWorker()
 
 }
 
-VideoBackgroundWorker::~VideoBackgroundWorker() {
-    cout << "GOODBYE FOREVER!" << endl;
-}
-
 void VideoBackgroundWorker::setup(ofDirectory dir)
 {
     this->videosDir = dir;
@@ -214,9 +210,5 @@ void VideoBackgroundWorker::threadedFunction()
     }
 
     this->workFinished = true;
-<<<<<<< HEAD
 
-=======
-    cout << "GOODBYE!" << endl;
->>>>>>> 307ff1cd1d75401f97718c59c4f03d2cfc989691
 }
