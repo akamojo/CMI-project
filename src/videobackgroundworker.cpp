@@ -84,7 +84,6 @@ void VideoBackgroundWorker::updateXMLWithVector(string path, string tag, string 
         double getCurrentValue = xmlHandler.getValue(subTag, missingValue);
         if (getCurrentValue == missingValue) {
             for (size_t i = 0; i < values.size(); ++i) {
-//                xmlHandler.setValue(subTag + ofToString(i+1), values[i], i);
                 xmlHandler.setValue(subTag, values[i], i);
             }
         }
@@ -94,7 +93,7 @@ void VideoBackgroundWorker::updateXMLWithVector(string path, string tag, string 
         else {
             for (size_t i = 0; i < values.size(); ++i) {
                 xmlHandler.addValue(tag, values[i]);
-                ofLog(OF_LOG_NOTICE, "Writing " + ofToString(values[i]) + " tag ");
+                ofLog(OF_LOG_NOTICE, "Adding " + ofToString(values[i]) + " tag ");
             }
         }
 
@@ -154,6 +153,7 @@ void VideoBackgroundWorker::threadedFunction()
 
         xmlHandler.clear();
         ofLog(OF_LOG_NOTICE, "[BG Worker] Checking video " + videoName);
+
         if (xmlHandler.loadFile(xmlFilePath)) {
 
             xmlHandler.pushTag("metadata");
@@ -202,5 +202,7 @@ void VideoBackgroundWorker::threadedFunction()
 
         }
     }
+
     this->workFinished = true;
+    cout << "GOODBYE!" << endl;
 }

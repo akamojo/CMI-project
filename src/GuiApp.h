@@ -47,6 +47,7 @@ public:
     ofxLabel videoColors;
 	ofxLabel videoRythm;
     ofxLabel edgeHist;
+    ofxLabel videoBestMatch;
 
     ofxLabel texMoments;
     string texMomentsString = "";
