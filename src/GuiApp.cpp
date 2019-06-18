@@ -275,12 +275,18 @@ void GuiApp::readXML(string videoXMLPath) {
         xmlHandler.popTag();
         edgeHist = edgesStr;
 
-        string texStr = "";
+        string texStr = "texture moments:\n";
         // read texture moments into string
         xmlHandler.pushTag("textureMoments");
         int numberOfTextureMoments = xmlHandler.getNumTags("tex");
         for (int i = 0; i < numberOfTextureMoments; ++i) {
-            texStr += ofToString(xmlHandler.getValue("tex", -1.0, i), 3);
+
+            double tex = xmlHandler.getValue("tex", -1.0, i);
+            if (tex / 10.0 < 1.0)
+                texStr += ofToString(tex, 3);
+            else
+                texStr += ofToString(tex, 2);
+
             if (i < numberOfTextureMoments-1)
                 texStr += " | ";
 
@@ -292,7 +298,6 @@ void GuiApp::readXML(string videoXMLPath) {
 
 //        ofSetColor(225);
 //        verdana14.drawString(texStr, 200, 200);
-        ofLog(OF_LOG_NOTICE, texStr);
 //        texMoments = texStr;
 
     }

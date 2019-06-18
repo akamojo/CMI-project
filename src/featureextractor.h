@@ -5,23 +5,29 @@
 #include "ofMain.h"
 #include "ofxCv.h"
 
+#include "keypointsmatcher.h"
 #include "ofxCvColorImage.h"
 #include "ofxCvGrayscaleImage.h"
 
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <opencv2/opencv.hpp>
+
+using namespace cv;
+using namespace ofxCv;
+using namespace std;
 
 class FeatureExtractor
 {
 public:
     FeatureExtractor();
-    void setup(std::string path);
+    void setup(string path);
     double getLuminance();
 	vector<double> getAvgColors();
 	double getRythm();
     vector<double> getEdgeDistribution();
-    std::string getVideoResolution();
+    string getVideoResolution();
     vector<double> getTextureMoments();
 
     void calculate();    
@@ -54,9 +60,9 @@ private:
 	vector<double> avgColors;
     vector<double> edgesHistogram;
 
-    std::string videoFilePath = "?";
-    std::string tempFilename = "videos/temp/temp.mp4";
-    std::string resolutionStr = "?";
+    string videoFilePath = "?";
+    string tempFilename = "videos/temp/temp.mp4";
+    string resolutionStr = "?";
     ofVideoPlayer videoPlayer;
 
     // Edge Distribution variables
@@ -76,6 +82,8 @@ private:
     const double thetas[7] = {22.5, 45.0, 67.5, 90.0, 123.75, 157.5, 180.0};
     vector<double> textureMoments;
 
+    // Keypoints
+    KeypointsMatcher keypointsMatcher;
 };
 
 #endif // FEATUREEXTRACTOR_H

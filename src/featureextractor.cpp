@@ -1,6 +1,8 @@
 #include "featureextractor.h"
 
 FeatureExtractor::FeatureExtractor() {
+
+
 }
 
 void FeatureExtractor::setup(std::string path)
@@ -21,6 +23,8 @@ void FeatureExtractor::setup(std::string path)
 
     ofFile fileToRead(path);
     fileToRead.copyTo(tempFilename, true, true);
+
+    keypointsMatcher.analyzeObjects("objects/");
 }
 
 
@@ -95,7 +99,6 @@ void FeatureExtractor::calculate() {
                 currentColors = this->calculateFrame();
                 luminance += currentColors[3];
 
-
                 if (this->calculateDiffBetweenFrames(grayImg) > this->rythmThreshold)
 					rythm += 1;
 
@@ -105,6 +108,13 @@ void FeatureExtractor::calculate() {
 				for (int i = 0; i < 3; i++) {
 					avgColors[i] += currentColors[i];
 				}
+
+                cout << "[KEYPOINTS]" << " " << videoFilePath << endl;
+                vector<size_t> objects = keypointsMatcher.countObjects(grayImg);
+                for (int i = 0; i < objects.size(); ++i) {
+                    cout << i << ". : " << objects[i] << endl;
+                }
+
 
             }
             this->frameCounter++;
@@ -128,17 +138,17 @@ void FeatureExtractor::calculate() {
 
 vector<double> FeatureExtractor::calculateTextures(ofxCvGrayscaleImage grayImg) {
     // to openCV
-    cv::Mat src = ofxCv::toCv(grayImg.getPixels());
-    cv::Mat gaborKernel, dst;
+    Mat src = toCv(grayImg.getPixels());
+    Mat gaborKernel, dst;
 
     vector<double> result;
-    cv::Mat m, stdv;
+    Mat m, stdv;
 
     for (int i = 0; i < sizeof(sigmas)/sizeof(double); ++i) {
         for (int j = 0; j < sizeof(thetas)/sizeof(double); ++j) {
-            gaborKernel = cv::getGaborKernel(cv::Size(3, 3), sigmas[i], thetas[j], 10.0, 0.5);
-            cv::filter2D(src, dst, -1, gaborKernel);
-            cv::meanStdDev(dst, m, stdv);
+            gaborKernel = getGaborKernel(Size(3, 3), sigmas[i], thetas[j], 10.0, 0.5);
+            filter2D(src, dst, -1, gaborKernel);
+            meanStdDev(dst, m, stdv);
             result.push_back(m.at<double>(0));
             result.push_back(stdv.at<double>(0));
         }
@@ -210,24 +220,24 @@ vector<double> FeatureExtractor::calculateFrame() {
 vector<double> FeatureExtractor::calculateEdgeDistribution(ofxCvGrayscaleImage grayImg) {
 
     // to openCV
-    cv::Mat src = ofxCv::toCv(grayImg.getPixels());
-    cv::Mat blurred, edges, binarized, kernel;
+    Mat src = toCv(grayImg.getPixels());
+    Mat blurred, edges, binarized, kernel;
 
     // blur
-    GaussianBlur(src, blurred, cv::Size(5, 5), 0);
+    GaussianBlur(src, blurred, Size(5, 5), 0);
 
     vector<double> result;
     double edges_ratio;
 
     // apply different edge filters
     for (int i = 0; i < kernelsNum; i++) {
-        kernel = cv::Mat(2, 2, CV_32F, kernels[i]);
+        kernel = Mat(2, 2, CV_32F, kernels[i]);
 
-        cv::filter2D(blurred, edges, CV_32F, kernel); // ? CV_32F - > -1?
-        cv::threshold(edges, binarized, threshold_value, max_binary_value, cv::THRESH_BINARY);
+        filter2D(blurred, edges, CV_32F, kernel); // ? CV_32F - > -1?
+        threshold(edges, binarized, threshold_value, max_binary_value, THRESH_BINARY);
 
-        cv::Size s = binarized.size();
-        edges_ratio = (double)cv::countNonZero(binarized) / (double)(s.height * s.width);
+        Size s = binarized.size();
+        edges_ratio = (double)countNonZero(binarized) / (double)(s.height * s.width);
 
         result.push_back(edges_ratio);
     }
