@@ -71,6 +71,7 @@ void FeatureExtractor::calculate() {
     ofLog(OF_LOG_NOTICE, "[FeatureExtractor] starts for " + videoFilePath + "...");
 
     double currentLumi;
+	double diff;
 	vector<double> currentColors;
     vector<vector<double>> framesEdgeHistograms;
 
@@ -99,8 +100,8 @@ void FeatureExtractor::calculate() {
                 currentColors = this->calculateFrame();
                 luminance += currentColors[3];
 
-                if (this->calculateDiffBetweenFrames(grayImg) > this->rythmThreshold)
-					rythm += 1;
+				diff = this->calculateDiffBetweenFrames(grayImg);
+				rythm += 1 - diff / (double) 255.0;
 
                 vector<double> currentEdgeDistribution = this->calculateEdgeDistribution(grayImg);
                 framesEdgeHistograms.push_back(currentEdgeDistribution);
