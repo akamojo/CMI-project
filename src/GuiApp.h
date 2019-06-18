@@ -7,6 +7,7 @@
 #include "videobackgroundworker.h"
 #include "webcampreview.h"
 #include "webcamfeatureextractor.h"
+#include "videoclassifier.h"
 
 #include <ofxCvHaarFinder.h>
 #include <ofxXmlSettings.h>
@@ -44,6 +45,10 @@ public:
     ofxLabel videoResolution;
 	ofxLabel videoCategory;
 
+	ofxButton categoryParty;
+	ofxButton categoryCalm;
+	ofxButton categoryOther;
+
     ofxLabel videoLuminance;
     ofxLabel videoColors;
 	ofxLabel videoRythm;
@@ -65,6 +70,8 @@ public:
 
     VideoBackgroundWorker worker;
 
+	VideoClassifier classifier;
+
     int thumbnailIdxOffset = 0;
     int thumbnailsOffset = 10;
 	int currentVideo = 0;
@@ -85,6 +92,10 @@ public:
 	void downButtonPressed();
     void addButtonPressed();
     void goBackButtonPressed();
+
+	void categoryPartySelected();
+	void categoryCalmSelected();
+	void categoryOtherSelected();
 
 	void playButtonPressed();
 	void pauseButtonPressed();
@@ -108,5 +119,6 @@ private:
 
     void loadObjectNames(string dirPath);
     void loadVideosNames(string dirPath);
+	void updateCategory(string);
 };
 

@@ -14,11 +14,11 @@ class VideoClassifier
 private:
 	int luminanceThreshold = 100;
 	double rythmThreshold = 0.05;
-
-	const char* CategoryToString(CategoryEnum);
+	
 public:
 	VideoClassifier();
 	string classify(double, double);
+	const char* CategoryToString(CategoryEnum);
 };
 
 #endif // CVIDEOCLASSIFIER_H
